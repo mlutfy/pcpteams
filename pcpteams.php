@@ -1,6 +1,7 @@
 <?php
 
 require_once 'pcpteams.civix.php';
+require_once 'pcpteams.inc.php';
 
 /**
  * Implementation of hook_civicrm_config
@@ -98,9 +99,66 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Contribute(&$form) {
 
   $form->setDefaults($defaults);
 
+  // Add a template to the form region to display the field
   CRM_Core_Region::instance('pcp-fields')->add(array(
     'template' => 'CRM/Pcpteams/ContributionPageSetup.tpl',
   ));
+}
+
+/**
+ * Form: CRM_PCP_Form_PCPAccount
+ * Description: new PCP profile account
+ * See: pcpteams_civicrm_buildForm()
+ */
+function pcpteams_civicrm_buildForm_CRM_PCP_Form_PCPAccount(&$form) {
+  $session = CRM_Core_Session::singleton();
+  $pcp_team_id = CRM_Utils_Request::retrieve('pcp_team_id', 'Positive', $session);
+}
+
+/**
+ * Form: CRM_PCP_Form_Campaign
+ * Description: create/edit a PCP page.
+ * See: pcpteams_civicrm_buildForm()
+ */
+function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
+  // Not really useful, since we know from the parent_id "is null" means PCP page is a team
+  // $types = array(1 => ts('Team'), 2 => ts('Individual'));
+  // $form->addElement('select', 'pcp_team_type', ts('Type'), $types);
+
+  $teams = array('' => ts('- select -')) + pcpteams_getteamnames();
+
+  // Do not allow to select their own page as a team
+  $pcp_id = CRM_Utils_Array::value('pcp_id', $form->_defaultValues);
+
+  if ($pcp_id && isset($teams[$pcp_id])) {
+    unset($teams[$pcp_id]);
+  }
+
+  $form->addElement('select', 'pcp_team_id', ts('Team'), $teams);
+
+  // Set default values
+  $session = CRM_Core_Session::singleton();
+  $pcp_team_id = $session->get('pcp_team_id');
+  $defaults = array();
+
+  if ($pcp_id) {
+    $pcp_team_id = pcpteams_getteam($pcp_id);
+    $defaults['pcp_team_id'] = $pcp_team_id;
+  }
+  elseif ($pcp_team_id) {
+    $defaults['pcp_team_id'] = $pcp_team_id;
+  }
+
+  $form->setDefaults($defaults);
+
+  // Add a template to the form region to display the field
+  CRM_Core_Region::instance('pcp-campaign')->add(array(
+    'template' => 'CRM/Pcpteams/CampaignPageSetup.tpl',
+    'weight' => -1,
+  ));
+
+  $resources = CRM_Core_Resources::singleton();
+  $resources->addStyleFile('ca.bidon.pcpteams', 'pcpteams.css');
 }
 
 /**
@@ -114,55 +172,39 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
       $pcp_team_active    = CRM_Utils_Array::value('pcp_team_active', $form->_submitValues);
 
       pcpteams_pcpblockteam_setvalue($target_entity_type, $target_entity_id, $pcp_team_active);
+      break;
+
+    case 'CRM_PCP_Form_Campaign':
+      $pcp_id = CRM_Utils_Array::value('pcp_id', $form->_defaultValues);
+      $pcp_team_id = CRM_Utils_Array::value('pcp_team_id', $form->_submitValues);
+
+      // FIXME: If we are creating a new PCP page, how do we get the page ID?
+      // Code below is making the dangerous assumptions that new PCP pages are not often created at the same time.
+      if (! $pcp_id) {
+        $dao = CRM_Core_DAO::executeQuery("SELECT max(id) as id FROM civicrm_pcp");
+        if ($dao->fetch()) {
+          $pcp_id = $dao->id;
+        }
+      }
+
+      pcpteams_setteam($pcp_id, $pcp_team_id);
+
+      // unset the value from the session so that it does not cause problems later on
+      // if the team is modified.
+      $session = CRM_Core_Session::singleton();
+      $session->get('pcp_team_id', NULL);
 
       break;
   }
 }
 
 /**
- * Returns the current pcpblock "team" is_active value.
- * e.g. whether the form allows PCP by teams.
+ * Implements hook_civicrm_post().
  */
-function pcpteams_pcpblockteam_getvalue($target_entity_type, $target_entity_id) {
-  $pcpblock = new CRM_PCP_DAO_PCPBlock();
-  $pcpblock->target_entity_type = $target_entity_type;
-  $pcpblock->target_entity_id = $target_entity_id;
-
-  if ($pcpblock->find(TRUE)) {
-    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_block_team WHERE civicrm_pcp_block_id = " . $pcpblock->id);
-
-    if ($dao->fetch()) {
-      return $dao->is_active;
-    }
-  }
-
-  return FALSE;
-}
-
-/**
- * Sets the current pcpblock "team" is_active value.
- * e.g. whether the form allows PCP by teams.
- */
-function pcpteams_pcpblockteam_setvalue($target_entity_type, $target_entity_id, $pcp_team_active) {
-  $pcpblock = new CRM_PCP_DAO_PCPBlock();
-  $pcpblock->target_entity_type = $target_entity_type;
-  $pcpblock->target_entity_id = $target_entity_id;
-
-  $pcp_team_active = intval($pcp_team_active);
-
-  if ($pcpblock->find(TRUE)) {
-    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_block_team WHERE civicrm_pcp_block_id = " . $pcpblock->id);
-
-    if ($dao->fetch()) {
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_pcp_block_team SET is_active = " . $pcp_team_active . " WHERE civicrm_pcp_block_id = " . $dao->civicrm_pcp_block_id);
-    }
-    else {
-      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_pcp_block_team (civicrm_pcp_block_id, is_active)
-                                  VALUES ({$pcpblock->id}, $pcp_team_active)");
-    }
-  }
-  else {
-    CRM_Core_Error::fatal(ts('Could not find the PCPBlock for entity: %1 %2', array(1 => $target_entity_id, 2 => $target_entity_type)));
+function pcpteams_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+  if ($op == 'create') {
+    die($op); // , 'op');
+    dsm($objectName, 'name');
   }
 }
 
