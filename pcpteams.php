@@ -199,12 +199,20 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
 }
 
 /**
- * Implements hook_civicrm_post().
+ * Implements hook_civicrm_pageRun().
  */
-function pcpteams_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-  if ($op == 'create') {
-    die($op); // , 'op');
-    dsm($objectName, 'name');
+function pcpteams_civicrm_pageRun(&$page) {
+  $name = get_class($page);
+
+  switch($name) {
+    case 'CRM_PCP_Page_PCPInfo':
+      // Add a template to the page region to display the team name
+      CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
+        'template' => 'CRM/Pcpteams/PCPInfo-team-name.tpl',
+        'weight' => -1,
+      ));
+  
+      break;
   }
 }
 
