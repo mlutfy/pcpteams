@@ -206,6 +206,13 @@ function pcpteams_civicrm_pageRun(&$page) {
 
   switch($name) {
     case 'CRM_PCP_Page_PCPInfo':
+      // Fetch the team pcp_id, if any
+      $smarty = CRM_Core_Smarty::singleton();
+
+      $pcp = $smarty->_tpl_vars['pcp'];
+      $pcp_id_parent = pcpteams_getteam($pcp['pcp_id']);
+      $smarty->assign('pcp_id_parent', $pcp_id_parent);
+
       // Add a template to the page region to display the team name
       CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
         'template' => 'CRM/Pcpteams/PCPInfo-team-name.tpl',

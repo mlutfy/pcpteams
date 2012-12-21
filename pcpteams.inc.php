@@ -120,18 +120,10 @@ function pcpteams_getteamname($pcp_id) {
 
   $pcp_id = intval($pcp_id);
 
-  // Fetch Parent PCP ID
-  $dao = CRM_Core_DAO::executeQuery("
-    SELECT civicrm_pcp_id_parent
-      FROM civicrm_pcp_team t
-     WHERE civicrm_pcp_id = $pcp_id
-  ");
-
-  if ($dao->fetch()) {
-    // Fetch PCP info of parent
+  if ($civicrm_pcp_id_parent = pcpteams_getteam($pcp_id)) {
     $pcp = new CRM_PCP_DAO_PCP();
-    $pcp->id = $dao->civicrm_pcp_id_parent;
-  
+    $pcp->id = $civicrm_pcp_id_parent;
+
     if ($pcp->find(TRUE)) {
       return $pcp->title;
     }
