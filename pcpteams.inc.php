@@ -57,6 +57,7 @@ function pcpteams_pcpblockteam_setvalue($target_entity_type, $target_entity_id, 
  */
 function pcpteams_setteam($pcp_id, $pcp_team_id) {
   $pcp_team_id = intval($pcp_team_id);
+  $pcp_type_id = ($pcp_type_id ? 2 : 1); // 2 = team
 
   if (! $pcp_team_id) {
     $pcp_team_id = 'NULL';
@@ -67,14 +68,16 @@ function pcpteams_setteam($pcp_id, $pcp_team_id) {
   if ($dao->fetch()) {
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_pcp_team
-      SET status_id = 1, civicrm_pcp_id_parent = " . $pcp_team_id . "
+      SET status_id = 1,
+        civicrm_pcp_id_parent = $pcp_team_id
+        type_id = $pcp_type_id
       WHERE civicrm_pcp_id = " . $pcp_id
     );
   }
   else {
     CRM_Core_DAO::executeQuery("
-      INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id)
-           VALUES ($pcp_id, $pcp_team_id, 1)
+      INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id)
+           VALUES ($pcp_id, $pcp_team_id, 1, $pcp_type_id)
     ");
   }
 }
