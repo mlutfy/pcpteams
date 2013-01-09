@@ -135,3 +135,34 @@ function pcpteams_getteamname($pcp_id) {
   return '';
 }
 
+/**
+ * Returns the PCP team members, if any
+ */
+function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
+  $members = array();
+
+  $pcp_id = intval($pcp_id);
+
+  $dao = CRM_Core_DAO::executeQuery("
+    SELECT team.civicrm_pcp_id as id, member.title
+      FROM civicrm_pcp_team team
+     INNER JOIN civicrm_pcp member ON (member.id = team.civicrm_pcp_id)
+     WHERE civicrm_pcp_id_parent = " . $pcp_id
+    . ($show_non_approved ? '' : " AND team.status_id = 1 ")
+    . ' ORDER BY member.title asc '
+  );
+
+  while ($dao->fetch()) {
+    $members[$dao->id] = array(
+      'title' => $dao->title,
+      'amount' => pcpteams_getamountraised($dao->id),
+    );
+  }
+
+  return $members;
+}
+
+function pcpteams_getamountraised($pcp_id) {
+  return 0; // TODO
+}
+

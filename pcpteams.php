@@ -206,18 +206,32 @@ function pcpteams_civicrm_pageRun(&$page) {
 
   switch($name) {
     case 'CRM_PCP_Page_PCPInfo':
-      // Fetch the team pcp_id, if any
+      // Fetch the team pcp_id, if any, to display the team name
       $smarty = CRM_Core_Smarty::singleton();
 
       $pcp = $smarty->_tpl_vars['pcp'];
       $pcp_id_parent = pcpteams_getteam($pcp['pcp_id']);
-      $smarty->assign('pcp_id_parent', $pcp_id_parent);
 
-      // Add a template to the page region to display the team name
-      CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
-        'template' => 'CRM/Pcpteams/PCPInfo-team-name.tpl',
-        'weight' => -1,
-      ));
+      if ($pcp_id_parent) {
+        $smarty->assign('pcp_id_parent', $pcp_id_parent);
+  
+        CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
+          'template' => 'CRM/Pcpteams/PCPInfo-team-name.tpl',
+          'weight' => -1,
+        ));
+      }
+      else {
+        // not a team member, so check if we are a team and have members
+        // TODO: show non-approved members to group managers?
+        // TODO: if individual page, do not show team listing. if group, show "no members" if none + "join".
+        $members = pcpteams_getmembers($pcp['pcp_id']);
+        $smarty->assign('pcp_members', $members);
+
+        CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
+          'template' => 'CRM/Pcpteams/PCPInfo-team-members.tpl',
+          'weight' => 99,
+        ));
+      }
   
       break;
   }
