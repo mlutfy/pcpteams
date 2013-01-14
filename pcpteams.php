@@ -100,7 +100,7 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Contribute(&$form) {
   $form->setDefaults($defaults);
 
   // Add a template to the form region to display the field
-  CRM_Core_Region::instance('pcp-fields')->add(array(
+  CRM_Core_Region::instance('pcp-form-pcp-fields')->add(array(
     'template' => 'CRM/Pcpteams/ContributionPageSetup.tpl',
   ));
 }
@@ -152,7 +152,7 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   $form->setDefaults($defaults);
 
   // Add a template to the form region to display the field
-  CRM_Core_Region::instance('pcp-campaign')->add(array(
+  CRM_Core_Region::instance('pcp-form-campaign')->add(array(
     'template' => 'CRM/Pcpteams/CampaignPageSetup.tpl',
     'weight' => -1,
   ));
