@@ -142,8 +142,8 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   $defaults = array();
 
   if ($pcp_id) {
-    $pcp_team_id = pcpteams_getteam($pcp_id);
-    $defaults['pcp_team_id'] = $pcp_team_id;
+    $pcp_team_info = pcpteams_getteaminfo($pcp_id);
+    $defaults['pcp_team_id'] = $pcp_team_info->civicrm_pcp_id_parent;
   }
   elseif ($pcp_team_id) {
     $defaults['pcp_team_id'] = $pcp_team_id;
@@ -210,10 +210,10 @@ function pcpteams_civicrm_pageRun(&$page) {
       $smarty = CRM_Core_Smarty::singleton();
 
       $pcp = $smarty->_tpl_vars['pcp'];
-      $pcp_id_parent = pcpteams_getteam($pcp['pcp_id']);
+      $pcp_team_info = pcpteams_getteaminfo($pcp['pcp_id']);
 
-      if ($pcp_id_parent) {
-        $smarty->assign('pcp_id_parent', $pcp_id_parent);
+      if ($pcp_team_info->civicrm_pcp_id_parent) {
+        $smarty->assign('pcp_id_parent', $pcp_team_info->civicrm_pcp_id_parent);
   
         CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
           'template' => 'CRM/Pcpteams/PCPInfo-team-name.tpl',
@@ -224,13 +224,15 @@ function pcpteams_civicrm_pageRun(&$page) {
         // not a team member, so check if we are a team and have members
         // TODO: show non-approved members to group managers?
         // TODO: if individual page, do not show team listing. if group, show "no members" if none + "join".
-        $members = pcpteams_getmembers($pcp['pcp_id']);
-        $smarty->assign('pcp_members', $members);
-
-        CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
-          'template' => 'CRM/Pcpteams/PCPInfo-team-members.tpl',
-          'weight' => 99,
-        ));
+        if ($pcp_team_info->type_id == CIVICRM_PCP_TEAM_TYPE_TEAM) {
+          $members = pcpteams_getmembers($pcp['pcp_id']);
+          $smarty->assign('pcp_members', $members);
+  
+          CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
+            'template' => 'CRM/Pcpteams/PCPInfo-team-members.tpl',
+            'weight' => 99,
+          ));
+        }
       }
   
       break;

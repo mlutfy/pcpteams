@@ -1,5 +1,9 @@
 <?php
 
+define('CIVICRM_PCP_TEAM_TYPE_INDIVIDUAL', 1);
+define('CIVICRM_PCP_TEAM_TYPE_TEAM', 2);
+
+
 /**
  * Helper functions.
  */
@@ -83,13 +87,14 @@ function pcpteams_setteam($pcp_id, $pcp_team_id) {
 }
 
 /**
- * Get the team of a PCP page.
+ * Get the civicrm_pcp_team record.
  */
-function pcpteams_getteam($pcp_id) {
-  $dao = CRM_Core_DAO::executeQuery("SELECT civicrm_pcp_id_parent FROM civicrm_pcp_team WHERE status_id = 1 AND civicrm_pcp_id = " . $pcp_id);
+function pcpteams_getteaminfo($pcp_id) {
+  $pcp_id = intval($pcp_id);
+  $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_team WHERE civicrm_pcp_id = " . $pcp_id);
 
   if ($dao->fetch()) {
-    return $dao->civicrm_pcp_id_parent;
+    return $dao;
   }
 
   return NULL;
@@ -122,10 +127,11 @@ function pcpteams_getteamname($pcp_id) {
   $teams = array();
 
   $pcp_id = intval($pcp_id);
+  $pcp_team_info = pcpteams_getteaminfo($pcp_id);
 
-  if ($civicrm_pcp_id_parent = pcpteams_getteam($pcp_id)) {
+  if ($pcp_team_info->civicrm_pcp_id_parent) {
     $pcp = new CRM_PCP_DAO_PCP();
-    $pcp->id = $civicrm_pcp_id_parent;
+    $pcp->id = $pcp_team_info->civicrm_pcp_id_parent;
 
     if ($pcp->find(TRUE)) {
       return $pcp->title;
