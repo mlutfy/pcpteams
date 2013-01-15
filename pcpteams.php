@@ -121,32 +121,80 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_PCPAccount(&$form) {
  * See: pcpteams_civicrm_buildForm()
  */
 function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
-  // Not really useful, since we know from the parent_id "is null" means PCP page is a team
-  // $types = array(1 => ts('Team'), 2 => ts('Individual'));
-  // $form->addElement('select', 'pcp_team_type', ts('Type'), $types);
-
-  $teams = array('' => ts('- select -')) + pcpteams_getteamnames();
-
-  // Do not allow to select their own page as a team
-  $pcp_id = CRM_Utils_Array::value('pcp_id', $form->_defaultValues);
-
-  if ($pcp_id && isset($teams[$pcp_id])) {
-    unset($teams[$pcp_id]);
-  }
-
-  $form->addElement('select', 'pcp_team_id', ts('Team'), $teams);
-
-  // Set default values
+  // Prepare default values (nb: radio buttons are handled differently since setDefault doesn't work)
   $session = CRM_Core_Session::singleton();
   $pcp_team_id = $session->get('pcp_team_id');
+  $pcp_id = CRM_Utils_Array::value('pcp_id', $form->_defaultValues);
+
   $defaults = array();
+  $pcp_team_info = NULL;
 
   if ($pcp_id) {
+    // Existing PCP page, so show previously saved values
     $pcp_team_info = pcpteams_getteaminfo($pcp_id);
     $defaults['pcp_team_id'] = $pcp_team_info->civicrm_pcp_id_parent;
+    $defaults['pcp_team_type'] = $pcp_team_info->type_id;
   }
   elseif ($pcp_team_id) {
+    // pcp_id in session means that the URL the user received is an invite to a team
     $defaults['pcp_team_id'] = $pcp_team_id;
+    $defaults['pcp_team_type'] = CIVICRM_PCPTEAM_TYPE_INDIVIDUAL;
+  }
+  else {
+    $defaults['pcp_team_type'] = CIVICRM_PCPTEAM_TYPE_INDIVIDUAL;
+  }
+
+  // Type of page (new team or individual)
+  // for existing pages, we do not allow to change this
+  if ($pcp_team_info) {
+    $e = $form->addElement('text', 'pcp_team_type_description', ts('Type'));
+    $e->freeze();
+    $defaults['pcp_team_type_description'] = ($defaults['pcp_team_type'] == CIVICRM_PCPTEAM_TYPE_INDIVIDUAL ? ts('Individual') : ts('Team'));
+  }
+  else {
+    $radios = array();
+  
+    $elements = array(
+      CIVICRM_PCPTEAM_TYPE_INDIVIDUAL => array(
+        'label' => ts('Individual'),
+        'onclick' => "show('pcp_team_id_wrapper', 'table-row')",
+      ),
+      CIVICRM_PCPTEAM_TYPE_TEAM => array(
+        'label' => ts('Team'),
+        'onclick' => "hide('pcp_team_id_wrapper')",
+      ),
+    );
+  
+    foreach ($elements as $key => $e) {
+      $options = array(
+        'onclick' => $e['onclick'],
+      );
+  
+      if ($defaults['pcp_team_type'] == $key) {
+        $options['checked'] = NULL;
+      }
+  
+      $radios[$key] = $form->addElement('radio', NULL, $key, $e['label'], NULL, $options);
+    }
+  
+    $form->addGroup($radios, 'pcp_team_type', ts('Type'));
+  }
+
+  // If individual, which team to join (may be empty)
+  if (! $pcp_team_info || ($pcp_team_info->type_id == CIVICRM_PCPTEAM_TYPE_INDIVIDUAL && $defaults['pcp_team_id'])) {
+    $teams = array('' => ts('- select -')) + pcpteams_getteamnames();
+  
+    // Do not allow to select their own page as a team
+    if ($pcp_id && isset($teams[$pcp_id])) {
+      unset($teams[$pcp_id]);
+    }
+  
+    $e = $form->addElement('select', 'pcp_team_id', ts('Team'), $teams);
+
+    // we do not allow people to change teams (keep it simple)
+    if ($pcp_team_info) {
+      $e->freeze();
+    }
   }
 
   $form->setDefaults($defaults);
@@ -177,6 +225,7 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
     case 'CRM_PCP_Form_Campaign':
       $pcp_id = CRM_Utils_Array::value('pcp_id', $form->_defaultValues);
       $pcp_team_id = CRM_Utils_Array::value('pcp_team_id', $form->_submitValues);
+      $pcp_team_type = CRM_Utils_Array::value('pcp_team_type', $form->_submitValues);
 
       // FIXME: If we are creating a new PCP page, how do we get the page ID?
       // Code below is making the dangerous assumptions that new PCP pages are not often created at the same time.
@@ -187,7 +236,7 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
         }
       }
 
-      pcpteams_setteam($pcp_id, $pcp_team_id);
+      pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_team_type);
 
       // unset the value from the session so that it does not cause problems later on
       // if the team is modified.
@@ -224,7 +273,7 @@ function pcpteams_civicrm_pageRun(&$page) {
         // not a team member, so check if we are a team and have members
         // TODO: show non-approved members to group managers?
         // TODO: if individual page, do not show team listing. if group, show "no members" if none + "join".
-        if ($pcp_team_info->type_id == CIVICRM_PCP_TEAM_TYPE_TEAM) {
+        if ($pcp_team_info->type_id == CIVICRM_PCPTEAM_TYPE_TEAM) {
           $members = pcpteams_getmembers($pcp['pcp_id']);
           $smarty->assign('pcp_members', $members);
   

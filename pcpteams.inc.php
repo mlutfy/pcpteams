@@ -1,7 +1,7 @@
 <?php
 
-define('CIVICRM_PCP_TEAM_TYPE_INDIVIDUAL', 1);
-define('CIVICRM_PCP_TEAM_TYPE_TEAM', 2);
+define('CIVICRM_PCPTEAM_TYPE_INDIVIDUAL', 1);
+define('CIVICRM_PCPTEAM_TYPE_TEAM', 2);
 
 
 /**
@@ -59,9 +59,8 @@ function pcpteams_pcpblockteam_setvalue($target_entity_type, $target_entity_id, 
  * Sets the team for a PCP page.
  * If the team is NULL, assumes it is a new team.
  */
-function pcpteams_setteam($pcp_id, $pcp_team_id) {
+function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id) {
   $pcp_team_id = intval($pcp_team_id);
-  $pcp_type_id = ($pcp_type_id ? 2 : 1); // 2 = team
 
   if (! $pcp_team_id) {
     $pcp_team_id = 'NULL';
@@ -70,6 +69,8 @@ function pcpteams_setteam($pcp_id, $pcp_team_id) {
   $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_team WHERE status_id = 1 AND civicrm_pcp_id = " . $pcp_id);
 
   if ($dao->fetch()) {
+/*
+  [ML] do not allow to update for now (change type or team).. too many things to manage.
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_pcp_team
       SET status_id = 1,
@@ -77,6 +78,7 @@ function pcpteams_setteam($pcp_id, $pcp_team_id) {
         type_id = $pcp_type_id
       WHERE civicrm_pcp_id = " . $pcp_id
     );
+*/
   }
   else {
     CRM_Core_DAO::executeQuery("
