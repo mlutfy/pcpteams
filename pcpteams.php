@@ -174,7 +174,7 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
         $options['checked'] = NULL;
       }
   
-      $radios[$key] = $form->addElement('radio', NULL, $key, $e['label'], NULL, $options);
+      $radios[$key] = $form->addElement('radio', NULL, $key, $e['label'], $key, $options);
     }
   
     $form->addGroup($radios, 'pcp_team_type', ts('Type'));
