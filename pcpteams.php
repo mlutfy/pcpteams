@@ -111,8 +111,7 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Contribute(&$form) {
  * See: pcpteams_civicrm_buildForm()
  */
 function pcpteams_civicrm_buildForm_CRM_PCP_Form_PCPAccount(&$form) {
-  $session = CRM_Core_Session::singleton();
-  $pcp_team_id = CRM_Utils_Request::retrieve('pcp_team_id', 'Positive', $session);
+  // not used
 }
 
 /**
