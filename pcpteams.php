@@ -144,6 +144,13 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
     $defaults['pcp_team_type'] = CIVICRM_PCPTEAM_TYPE_INDIVIDUAL;
   }
 
+  // For new pages, we keep a hidden field with the first/last name
+  // because team members cannot choose a name for their page.
+  // (this was a design choice, to keep the team member listings simple).
+  if (! $pcp_id) {
+    $form->addElement('hidden', 'pcp_team_default_title', $session->get('pcp_team_first_name') . ' ' . $session->get('pcp_team_last_name'));
+  }
+
   // Type of page (new team or individual)
   // for existing pages, we do not allow to change this
   if ($pcp_team_info) {
@@ -207,6 +214,7 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
 
   $resources = CRM_Core_Resources::singleton();
   $resources->addStyleFile('ca.bidon.pcpteams', 'pcpteams.css');
+  $resources->addScriptFile('ca.bidon.pcpteams', 'pcpteams.js');
 }
 
 /**
@@ -220,6 +228,12 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
       $pcp_team_active    = CRM_Utils_Array::value('pcp_team_active', $form->_submitValues);
 
       pcpteams_pcpblockteam_setvalue($target_entity_type, $target_entity_id, $pcp_team_active);
+      break;
+
+    case 'CRM_PCP_Form_PCPAccount':
+      $session = CRM_Core_Session::singleton();
+      $session->set('pcp_team_last_name', CRM_Utils_Array::value('last_name', $form->_submitValues));
+      $session->set('pcp_team_first_name', CRM_Utils_Array::value('first_name', $form->_submitValues));
       break;
 
     case 'CRM_PCP_Form_Campaign':
