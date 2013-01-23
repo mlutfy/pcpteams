@@ -154,6 +154,8 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   // Type of page (new team or individual)
   // for existing pages, we do not allow to change this
   if ($pcp_team_info) {
+    $form->addElement('hidden', 'pcp_team_type', $defaults['pcp_team_type'], array('id' => 'pcp_team_type'));
+
     $e = $form->addElement('text', 'pcp_team_type_description', ts('Type'));
     $e->freeze();
     $defaults['pcp_team_type_description'] = ($defaults['pcp_team_type'] == CIVICRM_PCPTEAM_TYPE_INDIVIDUAL ? ts('Individual') : ts('Team'));
