@@ -277,6 +277,8 @@ function pcpteams_civicrm_pageRun(&$page) {
       $pcp = $smarty->_tpl_vars['pcp'];
       $pcp_team_info = pcpteams_getteaminfo($pcp['pcp_id']);
 
+      $smarty->assign('pcpteams_type_id', $pcp_team_info->type_id);
+
       if ($pcp_team_info->civicrm_pcp_id_parent) {
         $smarty->assign('pcp_id_parent', $pcp_team_info->civicrm_pcp_id_parent);
   
