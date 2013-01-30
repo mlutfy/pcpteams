@@ -290,7 +290,6 @@ function pcpteams_civicrm_pageRun(&$page) {
       else {
         // not a team member, so check if we are a team and have members
         // TODO: show non-approved members to group managers?
-        // TODO: if individual page, do not show team listing. if group, show "no members" if none + "join".
         if ($pcp_team_info->type_id == CIVICRM_PCPTEAM_TYPE_TEAM) {
           $members = pcpteams_getmembers($pcp['pcp_id']);
           $smarty->assign('pcp_members', $members);
