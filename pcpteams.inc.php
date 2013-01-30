@@ -144,12 +144,18 @@ function pcpteams_getteamname($pcp_id) {
 }
 
 /**
- * Returns the PCP team members, if any
+ * Returns the PCP team members, if any.
+ * We keep the result cached because it can be called multiple times in a page.
+ * Ex: for the member listing, and "total amount raised".
  */
 function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
-  $members = array();
+  static $members = array();
 
   $pcp_id = intval($pcp_id);
+
+  if (isset($members[$pcp_id])) {
+    return $members[$pcp_id];
+  }
 
   $dao = CRM_Core_DAO::executeQuery("
     SELECT team.civicrm_pcp_id as id, member.title
@@ -161,16 +167,27 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
   );
 
   while ($dao->fetch()) {
-    $members[$dao->id] = array(
+    $members[$pcp_id][$dao->id] = array(
       'title' => $dao->title,
-      'amount' => pcpteams_getamountraised($dao->id),
+      'amount' => CRM_PCP_BAO_PCP::thermoMeter($dao->id),
     );
   }
 
-  return $members;
+  return $members[$pcp_id];
 }
 
+/**
+ * Calculates the amount raised for a team.
+ * For individuals we can used directly CRM_PCP_BAO_PCP::thermoMeter($pcp_id)
+ */
 function pcpteams_getamountraised($pcp_id) {
-  return 0; // TODO
+  $total = 0;
+  $members = pcpteams_getmembers($pcp_id);
+
+  foreach ($members as $key => $val) {
+    $total += $val['amount'];
+  }
+
+  return $total;
 }
 

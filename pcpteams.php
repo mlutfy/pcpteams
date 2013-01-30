@@ -294,7 +294,13 @@ function pcpteams_civicrm_pageRun(&$page) {
         if ($pcp_team_info->type_id == CIVICRM_PCPTEAM_TYPE_TEAM) {
           $members = pcpteams_getmembers($pcp['pcp_id']);
           $smarty->assign('pcp_members', $members);
-  
+
+          $total = pcpteams_getamountraised($pcp['pcp_id']);
+          $achieved = $total / $smarty->_tpl_vars['pcp']['goal_amount'] * 100;
+
+          $smarty->assign('total', $total);
+          $smarty->assign('achieved', $achieved);
+
           CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
             'template' => 'CRM/Pcpteams/PCPInfo-team-members.tpl',
             'weight' => 99,
