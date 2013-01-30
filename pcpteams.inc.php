@@ -157,12 +157,18 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
     return $members[$pcp_id];
   }
 
+  // Get the status_id for 'approved'
+  $pcpStatus  = CRM_Contribute_PseudoConstant::pcpStatus();
+  $approved   = CRM_Utils_Array::key(ts('Approved'), $pcpStatus);
+
+  // Get the members of the team
   $dao = CRM_Core_DAO::executeQuery("
-    SELECT team.civicrm_pcp_id as id, member.title
+    SELECT team.civicrm_pcp_id as id, member.title, member.is_active
       FROM civicrm_pcp_team team
      INNER JOIN civicrm_pcp member ON (member.id = team.civicrm_pcp_id)
      WHERE civicrm_pcp_id_parent = " . $pcp_id
     . ($show_non_approved ? '' : " AND team.status_id = 1 ")
+    . ' AND member.status_id = ' . $approved
     . ' ORDER BY member.title asc '
   );
 
@@ -170,6 +176,7 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
     $members[$pcp_id][$dao->id] = array(
       'title' => $dao->title,
       'amount' => CRM_PCP_BAO_PCP::thermoMeter($dao->id),
+      'is_active' => $dao->is_active,
     );
   }
 
