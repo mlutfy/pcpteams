@@ -294,7 +294,10 @@ function pcpteams_civicrm_pageRun(&$page) {
           $members = pcpteams_getmembers($pcp['pcp_id']);
           $smarty->assign('pcp_members', $members);
 
-          $total = pcpteams_getamountraised($pcp['pcp_id']);
+          // Calculate the total received for each members + to the team directly.
+          $total = CRM_PCP_BAO_PCP::thermoMeter($pcp['pcp_id']);
+          $total += pcpteams_getamountraised($pcp['pcp_id']);
+
           $achieved = $total / $smarty->_tpl_vars['pcp']['goal_amount'] * 100;
 
           $smarty->assign('total', $total);
