@@ -134,6 +134,7 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
     $pcp_team_info = pcpteams_getteaminfo($pcp_id);
     $defaults['pcp_team_id'] = $pcp_team_info->civicrm_pcp_id_parent;
     $defaults['pcp_team_type'] = $pcp_team_info->type_id;
+    $defaults['pcp_team_notifications'] = $pcp_team_info->notify_on_contrib;
   }
   elseif ($pcp_team_id) {
     // pcp_id in session means that the URL the user received is an invite to a team
@@ -206,12 +207,21 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
     }
   }
 
+  // Checkbox to receive contribution notifications
+  $form->addElement('checkbox', 'pcp_team_notifications', ts('Notifications'), ts('Notify me by e-mail when a new contribution is received.'));
+
   $form->setDefaults($defaults);
 
   // Add a template to the form region to display the field
   CRM_Core_Region::instance('pcp-form-campaign')->add(array(
     'template' => 'CRM/Pcpteams/CampaignPageSetup.tpl',
     'weight' => -1,
+  ));
+
+  // Add a template to the form region for the e-mail notification option
+  CRM_Core_Region::instance('pcp-form-campaign')->add(array(
+    'template' => 'CRM/Pcpteams/CampaignPageSetup-notifications.tpl',
+    'weight' => 99,
   ));
 
   $resources = CRM_Core_Resources::singleton();
@@ -242,6 +252,7 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
       $pcp_id = CRM_Utils_Array::value('pcp_id', $form->_defaultValues);
       $pcp_team_id = CRM_Utils_Array::value('pcp_team_id', $form->_submitValues);
       $pcp_team_type = CRM_Utils_Array::value('pcp_team_type', $form->_submitValues);
+      $pcp_team_notifications = CRM_Utils_Array::value('pcp_team_notifications', $form->_submitValues);
 
       // FIXME: If we are creating a new PCP page, how do we get the page ID?
       // Code below is making the dangerous assumptions that new PCP pages are not often created at the same time.
@@ -252,7 +263,11 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
         }
       }
 
+      // This only supports the initial creation for now
       pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_team_type);
+
+      // E-mail notifications on contribution received
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_pcp_team SET notify_on_contrib = " . intval($pcp_team_notifications) . " WHERE civicrm_pcp_id = " . $pcp_id);
 
       // unset the value from the session so that it does not cause problems later on
       // if the team is modified.

@@ -9,6 +9,7 @@ CREATE TABLE `civicrm_pcp_team` (
   `civicrm_pcp_id_parent` int(10) unsigned DEFAULT NULL COMMENT 'FK to parent Personal Campaign Page ID',
   `status_id` int(10) unsigned NOT NULL COMMENT 'Whether the team relation is active, pending, rejected.',
   `type_id` int(10) unsigned NOT NULL COMMENT 'Individual=1 or team=2 page.',
+  `notify_on_contrib` tinyint(4) unsigned NOT NULL COMMENT 'Send an e-mail to PCP page owner on new donation.',
   PRIMARY KEY (`id`),
   KEY `FK_civicrm_pcp_id` (`civicrm_pcp_id`),
   KEY `FK_civicrm_pcp_id_parent` (`civicrm_pcp_id_parent`),
