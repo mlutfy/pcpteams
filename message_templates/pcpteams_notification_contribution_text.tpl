@@ -1,4 +1,4 @@
-{ts 1=$contact.display_name}Dear %1{/ts},
+{ts 1=$displayName}Dear %1{/ts},
 
 {ts 1=$pcpName}You have received a new contribution on your Personal Campaign Page: %1.{/ts}
 

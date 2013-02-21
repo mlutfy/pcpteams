@@ -21,7 +21,7 @@
 
   <tr>
    <td>
-     <p>{ts 1=$contact.display_name}Dear %1{/ts},</p>
+     <p>{ts 1=$displayName}Dear %1{/ts},</p>
 
      {capture assign=pcpUrl}{crmURL p='civicrm/pcp/info' q="reset=1&id=`$pcpId`" a=true fe=1 h=1}{/capture}
      <p>{ts 1=$pcpUrl 2=$pcpName}You have received a new contribution on your Personal Campaign Page: <a href="%1">%2</a>.{/ts}</p>
