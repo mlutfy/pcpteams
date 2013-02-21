@@ -75,11 +75,35 @@ class CRM_Pcpteams_Upgrader_Base {
   /**
    * Run a SQL file
    */
-  public function executeSqlFile($relativePath) {
-    CRM_Utils_File::sourceSQLFile(
-      CIVICRM_DSN,
-      $this->extensionDir . '/' . $relativePath
-    );
+  public function executeSqlFile($relativePath, $smarty = FALSE) {
+    if ($smarty) {
+      $smarty = CRM_Core_Smarty::singleton();
+      $smarty->assign('domainID', CRM_Core_Config::domainID());
+      $smarty->assign('extDir', $this->extensionDir);
+
+      // FIXME: needs discussion with CiviCRM devs
+      // this sets the template dir to the extension main directory, so that
+      // we can do a smarty include for sql/ or message_template/ files.
+      $extRoot = dirname( __FILE__ ) . DIRECTORY_SEPARATOR;
+      if (is_array($smarty->template_dir)) {
+        array_unshift($smarty->template_dir, $extRoot . '../../../');
+      } else {
+        $smarty->template_dir = array($extRoot . '../../../', $smarty->template_dir);
+      }
+
+      CRM_Utils_File::sourceSQLFile(
+        CIVICRM_DSN,
+        $smarty->fetch($this->extensionDir . '/' . $relativePath),
+        NULL,
+        TRUE
+      );
+    }
+    else {
+      CRM_Utils_File::sourceSQLFile(
+        CIVICRM_DSN,
+        $this->extensionDir . '/' . $relativePath
+      );
+    }
     return TRUE;
   }
 
