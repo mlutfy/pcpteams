@@ -274,6 +274,32 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
       $session = CRM_Core_Session::singleton();
       $session->get('pcp_team_id', NULL);
 
+      // TEST
+      //get the default domain email address.
+      list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+
+      $tplParams = array(
+        'pcpId' => 123,
+        'pcpName' => 'Test PCP Name',
+        'displayName' => 'John Doe',
+        'contributorFirstName' => 'First Name',
+        'contributorLastName' => 'Last Name',
+        'contributorEmail' => 'foo@example.org',
+        'contributionAmount' => '50',
+      );
+
+      $sendTemplateParams = array(
+        'groupName' => 'msg_tpl_workflow_contribution',
+        'valueName' => 'pcpteams_notification_contribution',
+        'contactId' => 1, // $contactID,
+        'toEmail' => 'mathieu@bidon.ca',
+        'from' => "$domainEmailName <$domainEmailAddress>",
+        'tplParams' => $tplParams,
+        'isTest' => FALSE,
+      );
+
+      CRM_Core_BAO_MessageTemplates::sendTemplate($sendTemplateParams);
+
       break;
   }
 }

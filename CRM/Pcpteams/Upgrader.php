@@ -24,16 +24,16 @@ class CRM_Pcpteams_Upgrader extends CRM_Pcpteams_Upgrader_Base {
 
   /**
    * Example: Run a simple query when a module is enabled
-   *
+   */
   public function enable() {
-    CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
+    // CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
   }
 
   /**
    * Example: Run a simple query when a module is disabled
-   *
+   */
   public function disable() {
-    CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 0 WHERE bar = "whiz"');
+    // CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 0 WHERE bar = "whiz"');
   }
 
   /**
@@ -41,13 +41,12 @@ class CRM_Pcpteams_Upgrader extends CRM_Pcpteams_Upgrader_Base {
    *
    * @return TRUE on success
    * @throws Exception
-   *
+   */
   public function upgrade_4200() {
     $this->ctx->log->info('Applying update 4200');
-    CRM_Core_DAO::executeQuery('UPDATE foo SET bar = "whiz"');
-    CRM_Core_DAO::executeQuery('DELETE FROM bang WHERE willy = wonka(2)');
+    $this->executeSqlFile('sql/upgrade_4200.sql', TRUE);
     return TRUE;
-  } // */
+  }
 
 
   /**
@@ -60,7 +59,9 @@ class CRM_Pcpteams_Upgrader extends CRM_Pcpteams_Upgrader_Base {
     // this path is relative to the extension base dir
     $this->executeSqlFile('sql/upgrade_4201.sql');
     return TRUE;
-  } // */
+    CRM_Core_DAO::executeQuery('UPDATE foo SET bar = "whiz"');
+    CRM_Core_DAO::executeQuery('DELETE FROM bang WHERE willy = wonka(2)');
+  }  */
 
 
   /**
@@ -79,7 +80,7 @@ class CRM_Pcpteams_Upgrader extends CRM_Pcpteams_Upgrader_Base {
   public function processPart1($arg1, $arg2) { sleep(10); return TRUE; }
   public function processPart2($arg3, $arg4) { sleep(10); return TRUE; }
   public function processPart3($arg5) { sleep(10); return TRUE; }
-  // */
+   */
 
 
   /**
@@ -110,6 +111,6 @@ class CRM_Pcpteams_Upgrader extends CRM_Pcpteams_Upgrader_Base {
       $this->addTask($title, 'executeSql', $sql, $params);
     }
     return TRUE;
-  } // */
+  } */
 
 }
