@@ -46,5 +46,5 @@ SELECT @tpl_ovid := MAX(id) FROM civicrm_option_value WHERE option_group_id = @o
 {fetch assign=html file="$extDir/message_templates/pcpteams_notification_contribution_html.tpl"}
 
 INSERT INTO civicrm_msg_template (msg_title, msg_subject, msg_text, msg_html, workflow_id, is_default, is_reserved)
-VALUES ('{$title}', '{literal}{$pcpName}{/literal}: new contribution', '{$text|escape:"quotes"}', '{$html|escape:"quotes"}', @tpl_ovid, 1, 0);
+VALUES ('Contributions - PCP contribution notification', '{literal}{$pcpName}{/literal}: new contribution', '{$text|escape:"quotes"}', '{$html|escape:"quotes"}', @tpl_ovid, 1, 0);
 
