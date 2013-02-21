@@ -23,8 +23,7 @@
    <td>
      <p>{ts 1=$displayName}Dear %1{/ts},</p>
 
-     {capture assign=pcpUrl}{crmURL p='civicrm/pcp/info' q="reset=1&id=`$pcpId`" a=true fe=1 h=1}{/capture}
-     <p>{ts 1=$pcpUrl 2=$pcpName}You have received a new contribution on your Personal Campaign Page: <a href="%1">%2</a>.{/ts}</p>
+     <p>{ts}You have received a new contribution on your Personal Campaign Page:{/ts}</p>
 
      <ul>
        <li>{ts}First Name:{/ts} {$contributorFirstName}</li>
@@ -33,8 +32,8 @@
        <li>{ts}Amount:{/ts} {$contributionAmount|crmMoney}</li>
      </ul>
 
-     {capture assign=pcpEditUrl}{crmURL p='civicrm/pcp/info' q="reset=1&id=`$contributionPageId`" a=true fe=1 h=1}{/capture}
-     <p>{ts 1=$pcpEditUrl}This is an automatic message. You may disable these notifications by <a href="%1">changing your page settings</a>.{/ts}</p>
+     {capture assign=loginUrl}{crmURL p='user' a=true fe=1 h=1}{/capture}
+     <p>{ts 1=$loginUrl}This is an automatic message. You may disable these notifications by <a href="%1">changing your page settings</a>.{/ts}</p>
    </td>
   </tr>
 
