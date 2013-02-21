@@ -81,6 +81,12 @@ class CRM_Pcpteams_Upgrader_Base {
       $smarty->assign('domainID', CRM_Core_Config::domainID());
       $smarty->assign('extDir', $this->extensionDir);
 
+      // FIXME: need this for {localize} in sql files to work.
+      $domain = new CRM_Core_DAO_Domain();
+      $domain->find(TRUE);
+      $smarty->assign('multilingual', (bool) $domain->locales);
+      $smarty->assign('locales', explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales));
+
       // FIXME: needs discussion with CiviCRM devs
       // this sets the template dir to the extension main directory, so that
       // we can do a smarty include for sql/ or message_template/ files.
