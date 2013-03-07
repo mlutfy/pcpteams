@@ -112,13 +112,14 @@ function pcpteams_getteamnames() {
     SELECT pcp.id, pcp.title
       FROM civicrm_pcp_team t
       LEFT JOIN civicrm_pcp pcp ON (t.civicrm_pcp_id = pcp.id)
-     WHERE civicrm_pcp_id_parent IS NULL and type_id = " . CIVICRM_PCPTEAM_TYPE_TEAM
+     WHERE civicrm_pcp_id_parent IS NULL AND type_id = " . CIVICRM_PCPTEAM_TYPE_TEAM . " AND pcp.is_active = 1"
   );
 
   while ($dao->fetch()) {
     $teams[$dao->id] = $dao->title;
   }
 
+  natcasesort($teams);
   return $teams;
 }
 
