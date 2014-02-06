@@ -58,15 +58,40 @@ function pcpteams_pcpblockteam_setvalue($target_entity_type, $target_entity_id, 
 /**
  * Sets the team for a PCP page.
  * If the team is NULL, assumes it is a new team.
+ *
+ * @param Int $pcp_id ID of the PCP page in civicrm_pcp
+ * @param Int $pcp_team_id ID of the PCP team (NULL means the page is not part of a team).
+ * @param Int $pcp_type_id Type of PCP page (CIVICRM_PCPTEAM_TYPE_TEAM or CIVICRM_PCPTEAM_TYPE_INDIVIDUAL).
+ * @param Boolean $notifications Send e-mail notifications to the pcp page owner for each contribution received.
+ * @returns void.
  */
-function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id) {
-  $pcp_team_id = intval($pcp_team_id);
-
-  if (! $pcp_team_id) {
-    $pcp_team_id = 'NULL';
+function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id, $notifications = 0) {
+  // QuickForms might put null in here, if it was not checked.
+  if (! $notifications) {
+    $notifications = 0;
   }
 
-  $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_team WHERE status_id = 1 AND civicrm_pcp_id = " . $pcp_id);
+  // If it is a team page, make sure we do not allow to be part of another team
+  if ($pcp_type_id == CIVICRM_PCPTEAM_TYPE_TEAM) {
+    $pcp_team_id = NULL;
+  }
+
+  // Strict validation of the type of PCP id, since we don't want bad data in the DB.
+  $valid_team_types = array(
+    CIVICRM_PCPTEAM_TYPE_TEAM,
+    CIVICRM_PCPTEAM_TYPE_INDIVIDUAL,
+  );
+
+  if (! in_array($pcp_type_id, $valid_team_types)) {
+    CRM_Core_Error::fatal('Invalid PCP type received.');
+  }
+
+  // Check if the PCP page already has a record associating it (or not) to a team.
+  $params = array(
+    1 => array($pcp_id, 'Positive'),
+  );
+
+  $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_team WHERE status_id = 1 AND civicrm_pcp_id = %1", $params);
 
   if ($dao->fetch()) {
 /*
@@ -81,10 +106,31 @@ function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id) {
 */
   }
   else {
-    CRM_Core_DAO::executeQuery("
-      INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id)
-           VALUES ($pcp_id, $pcp_team_id, 1, $pcp_type_id)
-    ");
+    if ($pcp_team_id) {
+      $sql = "INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id, notify_on_contrib)
+                   VALUES (%1, %2, 1, %3, %4)";
+
+      $params = array(
+        1 => array($pcp_id, 'Positive'),
+        2 => array($pcp_team_id, 'Integer'),
+        3 => array($pcp_type_id, 'Integer'),
+        4 => array($notifications, 'Integer'),
+      );
+
+      CRM_Core_DAO::executeQuery($sql, $params);
+    }
+    else {
+      $sql = "INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id, notify_on_contrib)
+                   VALUES (%1, NULL, 1, %3, %4)";
+
+      $params = array(
+        1 => array($pcp_id, 'Positive'),
+        3 => array($pcp_type_id, 'Integer'),
+        4 => array($notifications, 'Integer'),
+      );
+
+      CRM_Core_DAO::executeQuery($sql, $params);
+    }
   }
 }
 
