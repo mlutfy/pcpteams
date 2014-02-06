@@ -167,19 +167,13 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
     $elements = array(
       CIVICRM_PCPTEAM_TYPE_INDIVIDUAL => array(
         'label' => ts('Individual'),
-        'onclick' => "show('pcp_team_id_wrapper', 'table-row')",
       ),
       CIVICRM_PCPTEAM_TYPE_TEAM => array(
         'label' => ts('Team'),
-        'onclick' => "hide('pcp_team_id_wrapper')",
       ),
     );
   
     foreach ($elements as $key => $e) {
-      $options = array(
-        'onclick' => $e['onclick'],
-      );
-  
       if ($defaults['pcp_team_type'] == $key) {
         $options['checked'] = NULL;
       }
