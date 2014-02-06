@@ -258,7 +258,7 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
       }
 
       // This only supports the initial creation for now
-      pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_team_type);
+      pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_team_type, $pcp_team_notifications);
 
       // E-mail notifications on contribution received
       CRM_Core_DAO::executeQuery("UPDATE civicrm_pcp_team SET notify_on_contrib = " . intval($pcp_team_notifications) . " WHERE civicrm_pcp_id = " . $pcp_id);
