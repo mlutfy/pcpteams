@@ -150,16 +150,37 @@ function pcpteams_getteaminfo($pcp_id) {
 
 /**
  * Returns a list of PCP-Teams.
+ *
+ * @param String $component_page_type
+ *     Contribute/event (although right now only contribute is fully supported).
+ * @param Int    $component_page_id
+ *     ID of the contribution page for which we want to list teams.
+ * @returns Array
+ *     Returns a sorted list of teams, keyed on the PCP ID.
  */
-function pcpteams_getteamnames() {
+function pcpteams_getteamnames($component_page_type = 'contribute', $component_page_id = NULL) {
   $teams = array();
 
-  $dao = CRM_Core_DAO::executeQuery("
+  $sql = "
     SELECT pcp.id, pcp.title
       FROM civicrm_pcp_team t
       LEFT JOIN civicrm_pcp pcp ON (t.civicrm_pcp_id = pcp.id)
-     WHERE civicrm_pcp_id_parent IS NULL AND type_id = " . CIVICRM_PCPTEAM_TYPE_TEAM . " AND pcp.is_active = 1"
+     WHERE civicrm_pcp_id_parent IS NULL
+       AND type_id = %1
+       AND pcp.is_active = 1
+       AND pcp.page_type = %2";
+
+  $params = array(
+    1 => array(CIVICRM_PCPTEAM_TYPE_TEAM, 'Positive'),
+    2 => array($component_page_type, 'String'),
   );
+
+  if ($component_page_id) {
+    $sql .= ' AND pcp.page_id = %3';
+    $params[3] = array($component_page_id, 'Positive');
+  }
+
+  $dao = CRM_Core_DAO::executeQuery($sql, $params);
 
   while ($dao->fetch()) {
     $teams[$dao->id] = $dao->title;

@@ -186,8 +186,12 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
 
   // If individual, which team to join (may be empty)
   if (! $pcp_team_info || ($pcp_team_info->type_id == CIVICRM_PCPTEAM_TYPE_INDIVIDUAL && $defaults['pcp_team_id'])) {
-    $teams = array('' => ts('- select -')) + pcpteams_getteamnames();
-  
+    // Taken from PCP/Form/Campaign.php postProcess
+    $component_page_type = $form->_component;
+    $component_page_id = $form->get('component_page_id') ? $form->get('component_page_id') : $form->_contriPageId;
+
+    $teams = array('' => ts('- select -')) + pcpteams_getteamnames($component_page_type, $component_page_id);
+
     // Do not allow to select their own page as a team
     if ($pcp_id && isset($teams[$pcp_id])) {
       unset($teams[$pcp_id]);
