@@ -111,8 +111,13 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Contribute(&$form) {
  * See: pcpteams_civicrm_buildForm()
  */
 function pcpteams_civicrm_buildForm_CRM_PCP_Form_PCPAccount(&$form) {
-  $session = CRM_Core_Session::singleton();
-  $pcp_team_id = CRM_Utils_Request::retrieve('pcp_team_id', 'Positive', $session);
+  // Avoid strange bug where this may be called on form submit, and wipe the session data.
+  if (! empty($_GET['action']) && $_GET['action'] == 'add') {
+    $pcp_team_id = CRM_Utils_Request::retrieve('pcp_team_id', 'Positive');
+
+    $session = CRM_Core_Session::singleton();
+    $session->set('pcp_team_id', $pcp_team_id);
+  }
 }
 
 /**
@@ -153,17 +158,18 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   }
 
   // Type of page (new team or individual)
-  // for existing pages, we do not allow to change this
-  if ($pcp_team_info) {
+  // We do not allow to change this for existing pages (or people following a "join this team" link).
+  if (! empty($defaults['pcp_team_id'])) {
     $form->addElement('hidden', 'pcp_team_type', $defaults['pcp_team_type'], array('id' => 'pcp_team_type'));
 
-    $e = $form->addElement('text', 'pcp_team_type_description', ts('Type'));
-    $e->freeze();
-    $defaults['pcp_team_type_description'] = ($defaults['pcp_team_type'] == CIVICRM_PCPTEAM_TYPE_INDIVIDUAL ? ts('Individual') : ts('Team'));
+    // This confuses the user more than necessary
+    // $e = $form->addElement('text', 'pcp_team_type_description', ts('Type'));
+    // $e->freeze();
+    // $defaults['pcp_team_type_description'] = ($defaults['pcp_team_type'] == CIVICRM_PCPTEAM_TYPE_INDIVIDUAL ? ts('Individual') : ts('Team'));
   }
   else {
     $radios = array();
-  
+
     $elements = array(
       CIVICRM_PCPTEAM_TYPE_INDIVIDUAL => array(
         'label' => ts('Individual'),
@@ -172,15 +178,15 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
         'label' => ts('Team'),
       ),
     );
-  
+
     foreach ($elements as $key => $e) {
       if ($defaults['pcp_team_type'] == $key) {
-        $options['checked'] = NULL;
+        $options['checked'] = TRUE;
       }
-  
+
       $radios[$key] = $form->addElement('radio', NULL, $key, $e['label'], $key, $options);
     }
-  
+
     $form->addGroup($radios, 'pcp_team_type', ts('Type'));
   }
 
@@ -196,11 +202,11 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
     if ($pcp_id && isset($teams[$pcp_id])) {
       unset($teams[$pcp_id]);
     }
-  
+
     $e = $form->addElement('select', 'pcp_team_id', ts('Team'), $teams);
 
     // we do not allow people to change teams (keep it simple)
-    if ($pcp_team_info) {
+    if ($defaults['pcp_team_id']) {
       $e->freeze();
     }
   }
@@ -293,7 +299,7 @@ function pcpteams_civicrm_pageRun(&$page) {
 
       if ($pcp_team_info->civicrm_pcp_id_parent) {
         $smarty->assign('pcp_id_parent', $pcp_team_info->civicrm_pcp_id_parent);
-  
+
         CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
           'template' => 'CRM/Pcpteams/PCPInfo-team-name.tpl',
           'weight' => -1,
@@ -321,7 +327,7 @@ function pcpteams_civicrm_pageRun(&$page) {
           ));
         }
       }
-  
+
       break;
   }
 }
