@@ -4,14 +4,14 @@ cj(function($) {
   function pcpteams_profile_toggle_title() {
     if ($('#pcp_team_id').val()) {
       // Has a team, so hide the title, the title will be his/her name
-      $('.crm-contribution-form-block-title').hide();
+      $('#Campaign .crm-contribution-form-block-title').hide();
       if ($('input[name="pcp_team_default_title"]').length > 0) {
         $('#pcp_title').val($('input[name="pcp_team_default_title"]').val());
       }
     }
     else {
       // Team page, or individual without a team
-      $('.crm-contribution-form-block-title').slideDown('slow');
+      $('#Campaign .crm-contribution-form-block-title').slideDown('slow');
     }
   }
 
@@ -20,18 +20,18 @@ cj(function($) {
   function pcpteams_profile_toggle_teamlist() {
     if ($('input[name="pcp_team_type"]:checked').val() == 1) {
       // Individual, so may chose from a team
-      $('.crm-contribution-form-block-pcp_team_name').slideDown('slow');
+      $('#Campaign .crm-pcp-team-name-section').slideDown('slow');
     }
     else {
       // Team, so hide list of teams to join
-      $('.crm-contribution-form-block-pcp_team_name').hide();
+      $('.crm-pcp-team-name-section').slideUp();
       $('#pcp_team_id').val('');
       pcpteams_profile_toggle_title();
     }
   }
 
   pcpteams_profile_toggle_title();
-  $('#pcp_team_id').change(function() {
+  $('#crm-container #Campaign #pcp_team_id').change(function() {
     pcpteams_profile_toggle_title();
   });
 
