@@ -25,6 +25,8 @@ cj(function($) {
     else {
       // Team, so hide list of teams to join
       $('.crm-contribution-form-block-pcp_team_name').hide();
+      $('#pcp_team_id').val('');
+      pcpteams_profile_toggle_title();
     }
   }
 
