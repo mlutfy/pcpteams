@@ -161,11 +161,6 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   // We do not allow to change this for existing pages (or people following a "join this team" link).
   if (! empty($defaults['pcp_team_id'])) {
     $form->addElement('hidden', 'pcp_team_type', $defaults['pcp_team_type'], array('id' => 'pcp_team_type'));
-
-    // This confuses the user more than necessary
-    // $e = $form->addElement('text', 'pcp_team_type_description', ts('Type'));
-    // $e->freeze();
-    // $defaults['pcp_team_type_description'] = ($defaults['pcp_team_type'] == CIVICRM_PCPTEAM_TYPE_INDIVIDUAL ? ts('Individual') : ts('Team'));
   }
   else {
     $radios = array();
@@ -191,7 +186,11 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   }
 
   // If individual, which team to join (may be empty)
-  if (! $pcp_team_info || ($pcp_team_info->type_id == CIVICRM_PCPTEAM_TYPE_INDIVIDUAL && $defaults['pcp_team_id'])) {
+  if (! empty($defaults['pcp_team_id'])) {
+    // we do not allow people to change teams (keep it simple)
+    $form->addElement('hidden', 'pcp_team_id', $defaults['pcp_team_id']);
+  }
+  else {
     // Taken from PCP/Form/Campaign.php postProcess
     $component_page_type = $form->_component;
     $component_page_id = $form->get('component_page_id') ? $form->get('component_page_id') : $form->_contriPageId;
@@ -203,12 +202,7 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
       unset($teams[$pcp_id]);
     }
 
-    $e = $form->addElement('select', 'pcp_team_id', ts('Team'), $teams);
-
-    // we do not allow people to change teams (keep it simple)
-    if ($defaults['pcp_team_id']) {
-      $e->freeze();
-    }
+    $form->addElement('select', 'pcp_team_id', ts('Team'), $teams);
   }
 
   // Checkbox to receive contribution notifications
