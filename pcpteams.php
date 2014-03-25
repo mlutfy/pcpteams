@@ -330,50 +330,53 @@ function pcpteams_civicrm_pageRun(&$page) {
  * Implements hook_civicrm_post().
  */
 function pcpteams_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-  if ($objectName == 'Contribution' && $op == 'create' && $objectRef->soft_credit_to) {
+  if ($objectName == 'SoftCredit' && $op == 'create') {
     //get the default domain email address.
     list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
 
-    $pcpcreator = new CRM_Contact_DAO_Contact();
-    $pcpcreator->id = $objectRef->soft_credit_to;
-    $pcpcreator->find(TRUE);
+    // FIXME: objectRef is received as an array, but should be an object.
+    // i.e. need to fix the patch on core.
 
-    $pcpcreatoremail = new CRM_Core_DAO_Email();
-    $pcpcreatoremail->contact_id = $objectRef->soft_credit_to;
-    $pcpcreatoremail->find(TRUE);
+    $contrib = new CRM_Contribute_DAO_Contribution();
+    $contrib->id = $objectRef['contribution_id'];
+    $contrib->find(TRUE);
+
+    $pcpcreator = civicrm_api3('Contact', 'getsingle', array(
+      'id' => $objectRef['contact_id'],
+    ));
 
     $contributor = new CRM_Contact_DAO_Contact();
-    $contributor->id = $objectRef->contact_id;
+    $contributor->id = $contrib->contact_id;
     $contributor->find(TRUE);
 
     $contributoremail = new CRM_Core_DAO_Email();
-    $contributoremail->contact_id = $objectRef->contact_id;
+    $contributoremail->contact_id = $contrib->contact_id;
     $contributoremail->find(TRUE);
 
     // NB: because we can't have the exact PCP page, we use the contribution page source
     // Ex: Online Contribution: Name of PCP Page.
-
+    // FIXME: since 4.4 we have the specific pcp_id in the soft_credit object.
     $tplParams = array(
-      'pcpName' => $objectRef->source,
-      'displayName' => $pcpcreator->display_name,
+      'pcpName' => $contrib->source,
+      'displayName' => $pcpcreator['display_name'],
       'contributorFirstName' => $contributor->first_name,
       'contributorLastName' => $contributor->last_name,
       'contributorEmail' => $contributoremail->email,
-      'contributionAmount' => $objectRef->total_amount,
-      'currency' => $objectRef->currency,
+      'contributionAmount' => $contrib->total_amount,
+      'currency' => $contrib->currency,
     );
 
     $sendTemplateParams = array(
       'groupName' => 'msg_tpl_workflow_contribution',
       'valueName' => 'pcpteams_notification_contribution',
-      'contactId' => $pcpcreator->id,
-      'toEmail' => $pcpcreatoremail->email,
+      'contactId' => $pcpcreator['contact_id'],
+      'toEmail' => $pcpcreator['email'],
       'from' => "$domainEmailName <$domainEmailAddress>",
       'tplParams' => $tplParams,
-      'isTest' => $objectRef->is_test,
+      'isTest' => $contrib->is_test,
     );
 
-    CRM_Core_BAO_MessageTemplates::sendTemplate($sendTemplateParams);
+    CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
   }
 }
 
