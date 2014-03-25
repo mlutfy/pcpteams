@@ -1,6 +1,5 @@
-<table class="form-layout-compressed" id="crm-contribution-campaign-form-block-pcp-team-notifications">
-<tr class="crm-contribution-form-block-pcp_team_notifications">
-    <td class="label">{$form.pcp_team_notifications.label}</td>
-    <td>{$form.pcp_team_notifications.html}</td>
-</tr>
-</table>
+<div class="crm-section crm-pcp-pcp_team_notifications-section">
+  <div class="label">{$form.pcp_team_notifications.label}</div>
+  <div class="content">{$form.pcp_team_notifications.html}</div>
+  <div class="clear"></div>
+</div>
