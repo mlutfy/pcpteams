@@ -1,6 +1,9 @@
-CiviCRM personal campaign teams allows people to create their own PCP page
-which is part of a team, with a common objective as well as an individual
-page for each member.
+CiviCRM PCP Teams
+=================
+
+CiviCRM personal campaign teams allows people to create their own personal
+campaign page (PCP) which is part of a team, with a common objective as well
+as an individual page for each member.
 
 Enabling the extension will allow the following:
 
@@ -33,21 +36,56 @@ Enabling the extension will allow the following:
 * Contributors can decide whether to give directly to the team, or to
   a specific team member.
 
-INSTALLATION:
+To download the latest version of this extension:
+https://github.com/mlutfy/ca.bidon.pcpteams
+
+More information:
+https://civicrm.org/blogs/mlutfy/personal-campaign-page-teams
+
+Requirements
+============
+
+- CiviCRM >= 4.4
+
+Installation
+============
 
 * Unpack the module code in your CiviCRM extension directory, then enable.
 
-* If you are using CiviCRM 4.2, you will need to patch a few templates. (TODO)
-  No need to patch for CiviCRM 4.3 and later.
+* This module requires a patch on CiviCRM core. See PATCHES.txt.
+  One patch is to add a SoftCredit "hook_civicrm_post", the other is optional,
+  so that "tell a friend" inherits the default subject/body configuration from
+  the contribution form.
 
-To download:
-https://github.com/mlutfy/civicrmpcpteams
+Support
+=======
 
-More information:
-http://civicrm.org/blogs/mlutfy/personal-campaign-page-teams
+Please post bug reports in the issue tracker of this project on github:
+https://github.com/mlutfy/ca.bidon.pcpteams/issues
 
-(C) 2012-2013 Mathieu Lutfy
-http://www.bidon.ca/en/about
+For general questions and support, please post on the "Extensions" forum:
+http://forum.civicrm.org/index.php/board,57.0.html
 
-Redistributed under the AGPL license:
-http://civicrm.org/licensing
+This is a community contributed extension written thanks to the financial
+support of organisations using it, as well as the very helpful and collaborative
+CiviCRM community.
+
+If you appreciate this module, please consider donating 10$ to the CiviCRM project:
+http://civicrm.org/participate/support-civicrm
+
+While I do my best to provide volunteer support for this extension, please
+consider financially contributing to support or development of this extension
+if you can.
+
+Commercial support via Coop SymbioTIC: <https://www.symbiotic.coop>
+
+Or you can send me the equivalent of a beer: <https://www.bidon.ca/en/paypal>
+
+License
+=======
+
+(C) 2012-2014 Mathieu Lutfy <mathieu@bidon.ca>
+https://www.bidon.ca/
+
+Distributed under the terms of the GNU Affero General public license (AGPL).
+See LICENSE.txt for details or https://civicrm.org/licensing.
