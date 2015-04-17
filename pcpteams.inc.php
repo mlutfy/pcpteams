@@ -159,6 +159,7 @@ function pcpteams_getteaminfo($pcp_id) {
  *     Returns a sorted list of teams, keyed on the PCP ID.
  */
 function pcpteams_getteamnames($component_page_type = 'contribute', $component_page_id = NULL) {
+  settype($component_page_type,'string');
   $teams = array();
 
   $sql = "
