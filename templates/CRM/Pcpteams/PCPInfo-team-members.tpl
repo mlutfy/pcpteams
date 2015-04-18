@@ -1,4 +1,5 @@
-<table class="civicrm-pcpteams-members">
+<br>
+<table class="civicrm-pcpteams-members table table-striped">
 <tbody>
   <tr>
     <th class="civicrm-pcpteams-members-title">{$pcp.title}</th>
