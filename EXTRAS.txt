@@ -1,0 +1,78 @@
+The following example adds "offline" amounts that were entered in a webform.
+Note that this is just an example, and includes hardcoded values.
+
+/**
+ * Implements hook_civicrm_pageRun().
+ * 
+ * NB: rename the function name 'example' to your custom module.
+ */
+function example_civicrm_pageRun(&$page) {
+   $name = get_class($page);
+         
+   switch($name) {
+     case 'CRM_PCP_Page_PCPInfo':
+       // Fetch the team pcp_id, if any, because we check offline donations only for individuals
+       // NB: we assume users only have one PCP page per campaign,
+       // since the entries in webforms are not tied to a PCP page, but to the drupal user.
+       if (! function_exists('pcpteams_getteaminfo')) {
+         break;
+       }
+
+       $smarty = CRM_Core_Smarty::singleton();
+
+       // Fetch information for the PCP page being currently displayed
+       $pcp = $smarty->_tpl_vars['pcp'];
+       $pcp_team_info = pcpteams_getteaminfo($pcp['pcp_id']);
+
+       // List of PCP page IDs for which we will check offline donations
+       $pcp_ids_members = array();
+       $offline = 0;
+
+       if ($pcp_team_info->type_id == CIVICRM_PCPTEAM_TYPE_INDIVIDUAL) {
+         $pcp_ids_members[] = $pcp['pcp_id'];
+       }
+       elseif ($pcp_team_info->type_id == CIVICRM_PCPTEAM_TYPE_TEAM) {
+         // Get IDs of all team members
+         $allmembers = pcpteams_getmembers($pcp['pcp_id']);
+         $pcp_ids_members = array_keys($allmembers);
+         // Add this page (team) as well
+         $pcp_ids_members[] = $pcp['pcp_id'];
+       }
+
+       foreach ($pcp_ids_members as $pcp_id) {
+         // Add amount received offline
+         $daopcp = new CRM_PCP_DAO_PCP();
+         $daopcp->id = $pcp_id;
+
+         if ($daopcp->find(TRUE)) {
+           $daouf = new CRM_Core_DAO_UFMatch();
+           $daouf->contact_id = $daopcp->contact_id;
+
+           if ($daouf->find(TRUE)) {
+             // FIXME hardcoded values
+             $nid_en = 1298;
+             $nid_fr = 1423;
+             $webform_cid = 5;
+
+             $x = db_query("SELECT sum(data) as offline
+                FROM {webform_submissions} as ws
+                LEFT JOIN webform_submitted_data wd on (wd.sid = ws.sid)
+                WHERE (ws.nid = :nid_en OR ws.nid = :nid_fr) and ws.uid = :uid and wd.cid = :cid",
+                array(':uid' => $daouf->uf_id, ':nid_en' => $nid_en, ':nid_fr' => $nid_fr, ':cid' => $webform_cid)
+             )->fetchField();
+
+             $offline += $x;
+           }
+         }
+       }
+
+       if ($offline) {
+         $smarty->assign('civicrm_offline_amount', $offline);
+         $offlineachieved = $offline / $smarty->_tpl_vars['pcp']['goal_amount'] * 100;
+         $smarty->assign('civicrm_offline_achieved', $offlineachieved);
+       }
+
+       break;
+   }
+}
+

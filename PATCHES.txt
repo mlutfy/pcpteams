@@ -1,0 +1,52 @@
+diff --git a/CRM/Contribute/BAO/ContributionSoft.php b/CRM/Contribute/BAO/ContributionSoft.php
+index b84903c..34166c4 100644
+--- a/CRM/Contribute/BAO/ContributionSoft.php
++++ b/CRM/Contribute/BAO/ContributionSoft.php
+@@ -59,7 +59,12 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
+       $config = CRM_Core_Config::singleton();
+       $contributionSoft->currency = $config->defaultCurrency;
+     }
+-    return $contributionSoft->save();
++
++    $return = $contributionSoft->save();
++
++    CRM_Utils_Hook::post('create', 'SoftCredit', $params['entity_id'], $params);
++
++    return $return;
+   }
+
+diff --git a/CRM/Friend/Form.php b/CRM/Friend/Form.php
+index 0a74441..94b53c7 100644
+--- a/CRM/Friend/Form.php
++++ b/CRM/Friend/Form.php
+@@ -295,8 +295,27 @@ class CRM_Friend_Form extends CRM_Core_Form {
+ 
+     CRM_Friend_BAO_Friend::getValues($defaults);
+     if ($this->_entityTable == 'civicrm_pcp') {
+-      $defaults['thankyou_text'] = $defaults['thankyou_title'] = ts('Thanks for your Support');
+-      $defaults['thankyou_text'] = ts('Thanks for supporting this campaign by spreading the word to your friends.');
++      // [ML] Fetches the tell-a-friend subject/body from the contribution page.
++      $pcp = new CRM_PCP_DAO_PCP();
++      $pcp->id = $this->_defaultValues['entity_id'];
++      $pcp->find(TRUE);
++
++      if ($pcp->page_id && $pcp->page_type == 'contribute') {
++        $friend = new CRM_Friend_DAO_Friend();
++        $friend->entity_table = 'civicrm_contribution_page';
++        $friend->entity_id = $pcp->page_id;
++        $friend->find(TRUE);
++
++        $defaults['thankyou_text'] = $defaults['thankyou_title'] = $friend->thankyou_title;
++
++        if ($friend->thankyou_text) {
++          $defaults['thankyou_text'] = $friend->thankyou_text;
++        }
++      }
++      else {
++        $defaults['thankyou_title'] = ts('Thanks for your Support');
++        $defaults['thankyou_text'] = ts('Thanks for supporting this campaign by spreading the word to your friends.');
++      }
+     }
+     elseif ($this->_entityTable == 'civicrm_contribution_page') {
+       // If this is tell a friend after contributing, give donor link to create their own fundraising page
+

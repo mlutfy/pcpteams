@@ -24,7 +24,7 @@
     <ver>4.5</ver>
     <ver>4.6</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module</comments>
+  <comments>See README.md for more information.</comments>
   <civix>
     <namespace>CRM/Pcpteams</namespace>
   </civix>
