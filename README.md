@@ -1,6 +1,17 @@
+# CiviCRM Personnal Campaign Teams
+
 CiviCRM personal campaign teams allows people to create their own PCP page
 which is part of a team, with a common objective as well as an individual
 page for each member.
+
+## Warning
+
+This extension is still minimally maintained, but in Spring 2015, Veda
+Consulting developed a similar extension with more features:
+
+https://github.com/veda-consulting/uk.co.vedaconsulting.pcpteams
+
+## Features
 
 Enabling the extension will allow the following:
 
@@ -33,7 +44,7 @@ Enabling the extension will allow the following:
 * Contributors can decide whether to give directly to the team, or to
   a specific team member.
 
-INSTALLATION:
+## Installation
 
 * Unpack the module code in your CiviCRM extension directory, then enable.
 
@@ -46,8 +57,10 @@ https://github.com/mlutfy/civicrmpcpteams
 More information:
 http://civicrm.org/blogs/mlutfy/personal-campaign-page-teams
 
-(C) 2012-2013 Mathieu Lutfy
-http://www.bidon.ca/en/about
+## Copyright and license
+
+(C) 2012-2015 Mathieu Lutfy
+https://www.symbiotic.coop
 
 Redistributed under the AGPL license:
-http://civicrm.org/licensing
+https://civicrm.org/licensing
