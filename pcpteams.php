@@ -312,8 +312,16 @@ function pcpteams_civicrm_pageRun(&$page) {
 
           $achieved = $total / $smarty->_tpl_vars['pcp']['goal_amount'] * 100;
 
+          $honor = $page->get_template_vars('honor');
+          foreach ($members as $dao => $member) {
+            if (!empty($member['honor'])) {
+              $honor = array_merge($honor, $member['honor']);
+            }
+          }
+
           $smarty->assign('total', $total);
           $smarty->assign('achieved', $achieved);
+          $page->assign('honor', $honor);
 
           CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
             'template' => 'CRM/Pcpteams/PCPInfo-team-members.tpl',

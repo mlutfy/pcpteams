@@ -251,6 +251,7 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
       'title' => $dao->title,
       'amount' => CRM_PCP_BAO_PCP::thermoMeter($dao->id),
       'is_active' => $dao->is_active,
+      'honor' => CRM_PCP_BAO_PCP::honorRoll($dao->id),
     );
   }
 
