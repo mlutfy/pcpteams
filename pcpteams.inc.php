@@ -3,6 +3,9 @@
 define('CIVICRM_PCPTEAM_TYPE_INDIVIDUAL', 1);
 define('CIVICRM_PCPTEAM_TYPE_TEAM', 2);
 
+define('CIVICRM_PCPTEAM_STATUS_APPROVED', 1);
+define('CIVICRM_PCPTEAM_STATUS_DENIED', 2);
+
 
 /**
  * Helper functions.
@@ -237,7 +240,7 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
 
   // Get the members of the team
   $dao = CRM_Core_DAO::executeQuery("
-    SELECT team.civicrm_pcp_id as id, member.title, member.is_active
+    SELECT team.civicrm_pcp_id as id, member.title, member.is_active, team.status_id as team_status_id
       FROM civicrm_pcp_team team
      INNER JOIN civicrm_pcp member ON (member.id = team.civicrm_pcp_id)
      WHERE civicrm_pcp_id_parent = " . $pcp_id
@@ -252,6 +255,7 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
       'amount' => CRM_PCP_BAO_PCP::thermoMeter($dao->id),
       'is_active' => $dao->is_active,
       'honor' => CRM_PCP_BAO_PCP::honorRoll($dao->id),
+      'team_status_id' => $dao->team_status_id,
     );
   }
 

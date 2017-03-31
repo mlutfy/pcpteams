@@ -208,6 +208,35 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   // Checkbox to receive contribution notifications
   $form->addElement('checkbox', 'pcp_team_notifications', ts('Notifications'), ts('Notify me by e-mail when a new contribution is received.'));
 
+  // this is a team page, but no parent.
+  if ($pcp_team_info->type_id == CIVICRM_PCPTEAM_TYPE_TEAM && empty($pcp_team_info->civicrm_pcp_id_parent)) {
+    $members = pcpteams_getmembers($pcp_id, TRUE);
+    foreach($members as $dao => $member) {
+      $member_status_radios = array();
+
+      $member_status_elements = array(
+        CIVICRM_PCPTEAM_STATUS_APPROVED => array(
+          'label' => ts('Approved'),
+        ),
+        CIVICRM_PCPTEAM_STATUS_DENIED => array(
+          'label' => ts('Denied'),
+        ),
+      );
+
+      $defaults["pcp_team_member_status_$dao"] = $member['team_status_id'];
+      $member_status_options = array();
+      foreach ($member_status_elements as $key => $e) {
+        if ($defaults["pcp_team_member_status_$dao"] == $key) {
+          $member_status_options['checked'] = TRUE;
+        }
+
+        $member_status_radios[$key] = $form->addElement('radio', NULL, $key, $e['label'], $key, $member_status_options);
+      }
+
+      $form->addGroup($member_status_radios, "pcp_team_member_status_$dao", ts('%1', array($member['title'])));
+    }
+  }
+
   $form->setDefaults($defaults);
 
   // Add a template to the form region to display the field
@@ -220,6 +249,12 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   CRM_Core_Region::instance('pcp-form-campaign')->add(array(
     'template' => 'CRM/Pcpteams/CampaignPageSetup-notifications.tpl',
     'weight' => 99,
+  ));
+
+  // Add a template to the form region for the e-mail notification option
+  CRM_Core_Region::instance('pcp-form-campaign')->add(array(
+    'template' => 'CRM/Pcpteams/CampaignPageSetup-member-status.tpl',
+    'weight' => 100,
   ));
 
   $resources = CRM_Core_Resources::singleton();
