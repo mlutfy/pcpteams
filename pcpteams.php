@@ -162,6 +162,10 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   if (! empty($defaults['pcp_team_id'])) {
     $form->addElement('hidden', 'pcp_team_type', $defaults['pcp_team_type'], array('id' => 'pcp_team_type'));
   }
+  else if (empty($defaults['pcp_team_id']) && $defaults['pcp_team_type'] == CIVICRM_PCPTEAM_TYPE_TEAM) {
+    // Team lead can also not change the team type once it is set.
+    $form->addElement('hidden', 'pcp_team_type', $defaults['pcp_team_type'], array('id' => 'pcp_team_type'));
+  }
   else {
     $radios = array();
 
