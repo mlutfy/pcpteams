@@ -94,7 +94,7 @@ function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id, $notifications = 
     1 => array($pcp_id, 'Positive'),
   );
 
-  $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_team WHERE status_id = 1 AND civicrm_pcp_id = %1", $params);
+  $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_team WHERE civicrm_pcp_id = %1", $params);
 
   if ($dao->fetch()) {
 /*
