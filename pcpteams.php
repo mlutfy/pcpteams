@@ -174,6 +174,7 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
       ),
     );
 
+    $options = array();
     foreach ($elements as $key => $e) {
       if ($defaults['pcp_team_type'] == $key) {
         $options['checked'] = TRUE;
