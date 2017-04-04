@@ -126,12 +126,14 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_PCPAccount(&$form) {
  * See: pcpteams_civicrm_buildForm()
  */
 function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
+
   // Prepare default values (nb: radio buttons are handled differently since setDefault doesn't work)
   $session = CRM_Core_Session::singleton();
   $pcp_team_id = $session->get('pcp_team_id');
   $pcp_id = CRM_Utils_Array::value('pcp_id', $form->_defaultValues);
 
   $defaults = array();
+  $pcp_team_info_template = array();
   $pcp_team_info = NULL;
 
   if ($pcp_id) {
@@ -140,15 +142,26 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
     $defaults['pcp_team_id'] = $pcp_team_info->civicrm_pcp_id_parent;
     $defaults['pcp_team_type'] = $pcp_team_info->type_id;
     $defaults['pcp_team_notifications'] = $pcp_team_info->notify_on_contrib;
+    $pcp_team_info_template['team_id'] = $pcp_team_info->civicrm_pcp_id_parent;
+    $pcp_team_info_template['team_type'] = $pcp_team_info->type_id;
   }
   elseif ($pcp_team_id) {
     // pcp_id in session means that the URL the user received is an invite to a team
     $defaults['pcp_team_id'] = $pcp_team_id;
     $defaults['pcp_team_type'] = CIVICRM_PCPTEAM_TYPE_INDIVIDUAL;
+    $pcp_team_info_template['team_id'] = $pcp_team_id;
+    $pcp_team_info_template['team_type'] = CIVICRM_PCPTEAM_TYPE_INDIVIDUAL;
   }
   else {
     $defaults['pcp_team_type'] = CIVICRM_PCPTEAM_TYPE_INDIVIDUAL;
+    $pcp_team_info_template['team_type'] = CIVICRM_PCPTEAM_TYPE_INDIVIDUAL;
+    $pcp_team_info_template['team_id'] = NULL;
   }
+
+  // Add team information to template variables
+  // TODO: this doesn't really belong here. relocate to the civi form run hook or somewhere better
+  $smarty = CRM_Core_Smarty::singleton();
+  $smarty->assign('pcp_team_info', $pcp_team_info_template);
 
   // For new pages, we keep a hidden field with the first/last name
   // because team members cannot choose a name for their page.

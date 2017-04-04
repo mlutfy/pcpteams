@@ -1,4 +1,4 @@
-{if is_array($form) && $form.pcp_team_type.value == 2 && is_array($form.pcp_team_id) && empty($form.pcp_team_id.value)}
+{if $pcp_team_info.team_type == 2 && empty($pcp_team_info.team_id)}
   <h2>Manage Team Members</h2>
   <div class="crm-section crm-pcp-pcp_team_status-section">
   {foreach from=$form key=form_element_name item=form_element}
