@@ -293,6 +293,7 @@ function pcpteams_civicrm_pageRun(&$page) {
 
       if ($pcp_team_info->civicrm_pcp_id_parent) {
         $smarty->assign('pcp_id_parent', $pcp_team_info->civicrm_pcp_id_parent);
+        $smarty->assign('pcp_team_status_id', $pcp_team_info->status_id);
 
         CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
           'template' => 'CRM/Pcpteams/PCPInfo-team-name.tpl',
