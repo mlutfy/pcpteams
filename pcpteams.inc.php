@@ -91,11 +91,12 @@ function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id, $notifications = 
     1 => array($pcp_id, 'Positive'),
   );
 
-  $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_team WHERE status_id = 1 AND civicrm_pcp_id = %1", $params);
+  $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_team WHERE status_id = 1 AND civicrm_pcp_id = %1 AND civicrm_pcp_id_parent is not NULL", $params);
 
   if ($dao->fetch()) {
 /*
   [ML] do not allow to update for now (change type or team).. too many things to manage.
+  [PeaceWorks] going to assume it's ok to to set a parent, if no parent exists yet (below)
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_pcp_team
       SET status_id = 1,
@@ -107,16 +108,31 @@ function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id, $notifications = 
   }
   else {
     if ($pcp_team_id) {
-      $sql = "INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id, notify_on_contrib)
-                   VALUES (%1, %2, 1, %3, %4)";
-
-      $params = array(
-        1 => array($pcp_id, 'Positive'),
-        2 => array($pcp_team_id, 'Integer'),
-        3 => array($pcp_type_id, 'Integer'),
-        4 => array($notifications, 'Integer'),
-      );
-
+      // Check if there's an existing record, that just doesn't have a parent yet
+      $dao2 = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_team WHERE civicrm_pcp_id = %1", $params);
+      if ($dao2->fetch()) {
+        // A PCP record exists, but no parent
+        $sql = "UPDATE civicrm_pcp_team SET civicrm_pcp_id_parent=%1 WHERE civicrm_pcp_id=%2";
+   
+        // Assuming we can ignore other params like pcp_type_id and notifications here...?
+        // We'll only update the team id, and leave the other fields to be managed elsewhere
+        $params = array(
+          1 => array($pcp_team_id, 'Integer'),
+          2 => array($pcp_id, 'Positive'),
+        );
+      }
+      else {
+        // No record in civicrm_pcp_team for this PCP
+        $sql = "INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id, notify_on_contrib)
+                     VALUES (%1, %2, 1, %3, %4)";
+   
+        $params = array(
+          1 => array($pcp_id, 'Positive'),
+          2 => array($pcp_team_id, 'Integer'),
+          3 => array($pcp_type_id, 'Integer'),
+          4 => array($notifications, 'Integer'),
+        );
+      }
       CRM_Core_DAO::executeQuery($sql, $params);
     }
     else {
