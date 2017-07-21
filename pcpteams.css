@@ -1,4 +1,16 @@
 #crm-container #crm-contribution-campaign-form-block-pcp-team {
   width: 100%;
 }
+#crm-container.crm-public .crm-section.crm-pcp-team-info-section {
+  margin-top: 3px;
+  margin-bottom: 8px;
+}
+#civicrm-pcpteams-pcpinfo-teamname {
+  font-weight: 700;
+  margin: 10px 0;
+  text-align: center;
+}
+.crm-container .crm-submit-buttons {
+  margin-top: 20px;
+}
 
