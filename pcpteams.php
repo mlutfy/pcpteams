@@ -3,6 +3,8 @@
 require_once 'pcpteams.civix.php';
 require_once 'pcpteams.inc.php';
 
+use CRM_Pcpteams_ExtensionUtil as E;
+
 /**
  * Implementation of hook_civicrm_config
  */
@@ -87,7 +89,7 @@ function pcpteams_civicrm_buildForm($formName, &$form) {
  * See: pcpteams_civicrm_buildForm()
  */
 function pcpteams_civicrm_buildForm_CRM_PCP_Form_Contribute(&$form) {
-  $form->addElement('checkbox', 'pcp_team_active', ts('Enable Personal Campaign Pages for Teams?'));
+  $form->addElement('checkbox', 'pcp_team_active', E::ts('Enable Personal Campaign Pages for Teams?'));
 
   $target_entity_table = CRM_Utils_Array::value('target_entity_table', $form->_defaultValues);
   $target_entity_id    = CRM_Utils_Array::value('target_entity_id', $form->_defaultValues);
@@ -167,10 +169,10 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
 
     $elements = array(
       CIVICRM_PCPTEAM_TYPE_INDIVIDUAL => array(
-        'label' => ts('This page represents an individual'),
+        'label' => E::ts('This page represents an individual'),
       ),
       CIVICRM_PCPTEAM_TYPE_TEAM => array(
-        'label' => ts('This page represents a team'),
+        'label' => E::ts('This page represents a team'),
       ),
     );
 
@@ -182,7 +184,7 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
       $radios[$key] = $form->addElement('radio', NULL, $key, $e['label'], $key, $options);
     }
 
-    $form->addGroup($radios, 'pcp_team_type', ts('Type'));
+    $form->addGroup($radios, 'pcp_team_type', E::ts('Type'));
   }
 
   // If individual, which team to join (may be empty)
@@ -202,11 +204,11 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
       unset($teams[$pcp_id]);
     }
 
-    $form->addElement('select', 'pcp_team_id', ts('Team'), $teams);
+    $form->addElement('select', 'pcp_team_id', E::ts('Team'), $teams);
   }
 
   // Checkbox to receive contribution notifications
-  $form->addElement('checkbox', 'pcp_team_notifications', ts('Notifications'));
+  $form->addElement('checkbox', 'pcp_team_notifications', E::ts('Notifications'));
 
   $form->setDefaults($defaults);
 

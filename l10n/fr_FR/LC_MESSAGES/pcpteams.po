@@ -1,0 +1,104 @@
+#: ./CRM/Pcpteams/Upgrader/Base.php
+msgid "Upgrade %1 to revision %2"
+msgstr ""
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "Dear %1"
+msgstr ""
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "You have received a new contribution on your Personal Campaign Page:"
+msgstr "Vous avez reçu une nouvelle contribution sur votre page de campagne personnalisée :"
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "First Name:"
+msgstr "Prénom :"
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "Last Name:"
+msgstr "Nom de famille :"
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "E-mail:"
+msgstr "Courriel :"
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "Amount:"
+msgstr "Montant :"
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl
+msgid "This is an automatic message. You may disable these notifications by <a href=\"%1\">changing your page settings</a>."
+msgstr "Ceci est un message automatique. Vous pouvez désactiver ces notifications en <a href=\"%1\">modifiant vos paramètres</a>."
+
+#: ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "This is an automatic message. You may disable these notifications by changing your page settings:"
+msgstr "Ceci est un message automatique. Vous pouvez désactiver ces notifications en modifiant vos préférences sur cette page :"
+
+#: ./pcpteams.inc.php
+msgid "Could not find the PCPBlock for entity: %1 %2"
+msgstr ""
+
+#: ./pcpteams.inc.php
+msgid "Approved"
+msgstr "Approuvé"
+
+#: ./pcpteams.php
+msgid "Enable Personal Campaign Pages for Teams?"
+msgstr "Activer les pages de contributions personnalisées pour les équipes ?"
+
+#: ./pcpteams.php
+msgid "This page represents an individual"
+msgstr "Cette page représente une personne"
+
+#: ./pcpteams.php
+msgid "This page represents a team"
+msgstr "Cette page représente une équipe"
+
+#: ./pcpteams.php
+msgid "Type"
+msgstr "Type"
+
+#: ./pcpteams.php
+msgid "- select -"
+msgstr "- choisir -"
+
+#: ./pcpteams.php
+msgid "Team"
+msgstr "Équipe"
+
+#: ./pcpteams.php
+msgid "Notifications"
+msgstr "Notifications"
+
+#: ./templates/CRM/Pcpteams/CampaignPageSetup-notifications.tpl
+msgid "Notify me by e-mail when a new contribution is received."
+msgstr "M'informer par courriel lorsqu'une nouvelle contribution est reçue."
+
+#: ./templates/CRM/Pcpteams/CampaignPageSetup.tpl
+msgid "<strong>If you want to start a team</strong>, first create a team page. Then you (and your friends) can create your individual pages, and add them to the team."
+msgstr "<strong>Pour créer une équipe</strong>, créer la page d'équipe en premier. Vous (et vos amis) pourrez ensuite créer des pages individuelles, puis se joindre à l'équipe."
+
+#: ./templates/CRM/Pcpteams/CampaignPageSetup.tpl
+msgid "<strong>If you want to join an existing team</strong>, choose \"Individual\" for the \"Type\" below, then select the team you'd like you join from the \"Team\" drop-down list."
+msgstr "<strong>Pour rejoindre une équipe existante</strong>, choisir l'option « Individu » dans le champ « Type » ci-dessous, puis sélectionner l'équipe que vous désirez rejoindre à partir du champ « Équipe »."
+
+#: ./templates/CRM/Pcpteams/CampaignPageSetup.tpl
+msgid "If this page is being used to represent a team, choose \"Team\", otherwise choose \"Individual\" to create a page for yourself as a person. If you are a member of a team, choose \"Individual\" here and then choose the team to join below."
+msgstr "Si cette page est utilisée pour représenter une équipe, choisir « Équipe », sinon choisir « Individu » pour créer une page en votre nom. Si vous êtes membre d'une équipe, choisir « Individu » puis vous pourrez choisir le nom de l'équipe à joindre."
+
+#: ./templates/CRM/Pcpteams/CampaignPageSetup.tpl
+msgid "Choose the team you'd like to join. Leave this field empty if you do not want to join a team."
+msgstr "Sélectionner l'équipe que vous désirez rejoindre. Laisser ce champ libre si vous ne voulez pas vous joindre à une équipe."
+
+#: ./templates/CRM/Pcpteams/PCPInfo-team-members.tpl
+msgid "Raised"
+msgstr "Reçu"
+
+#: ./templates/CRM/Pcpteams/PCPInfo-team-members.tpl
+msgid "No members"
+msgstr "Aucun membre"
+
+#: ./templates/CRM/Pcpteams/PCPInfo-team-name.tpl
+msgid "I'm campaigning as part of a team:"
+msgstr "Je fais campagne avec une équipe :"
+

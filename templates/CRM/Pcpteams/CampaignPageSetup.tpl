@@ -1,7 +1,8 @@
+{crmScope extensionKey='ca.bidon.pcpteams'}
 {if $form.pcp_team_type}
   <div class="crm-section crm-pcp-team-info-section help">
-    <p><strong>If you want to start a team</strong>, first create a team page. Then you (and your friends) can create your individual pages, and add them to the team.</p>
-    <p><strong>If you want to join an existing team</strong>, choose "Individual" for the "Type" below, then select the team you'd like you join from the "Team" drop-down list.</p>
+    <p>{ts}<strong>If you want to start a team</strong>, first create a team page. Then you (and your friends) can create your individual pages, and add them to the team.{/ts}</p>
+    <p>{ts}<strong>If you want to join an existing team</strong>, choose "Individual" for the "Type" below, then select the team you'd like you join from the "Team" drop-down list.{/ts}</p>
   </div>
   <div class="crm-section crm-pcp-team-type-section">
     <div class="label">{$form.pcp_team_type.label}</div>
@@ -24,3 +25,4 @@
     <div class="clear"></div>
   </div>
 {/if}
+{/crmScope}

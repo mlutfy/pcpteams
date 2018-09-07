@@ -1,0 +1,104 @@
+#: ./CRM/Pcpteams/Upgrader/Base.php
+msgid "Upgrade %1 to revision %2"
+msgstr ""
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "Dear %1"
+msgstr ""
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "You have received a new contribution on your Personal Campaign Page:"
+msgstr ""
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "First Name:"
+msgstr ""
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "Last Name:"
+msgstr ""
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "E-mail:"
+msgstr ""
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "Amount:"
+msgstr ""
+
+#: ./message_templates/pcpteams_notification_contribution_html.tpl
+msgid "This is an automatic message. You may disable these notifications by <a href=\"%1\">changing your page settings</a>."
+msgstr ""
+
+#: ./message_templates/pcpteams_notification_contribution_text.tpl
+msgid "This is an automatic message. You may disable these notifications by changing your page settings:"
+msgstr ""
+
+#: ./pcpteams.inc.php
+msgid "Could not find the PCPBlock for entity: %1 %2"
+msgstr ""
+
+#: ./pcpteams.inc.php
+msgid "Approved"
+msgstr ""
+
+#: ./pcpteams.php
+msgid "Enable Personal Campaign Pages for Teams?"
+msgstr ""
+
+#: ./pcpteams.php
+msgid "This page represents an individual"
+msgstr ""
+
+#: ./pcpteams.php
+msgid "This page represents a team"
+msgstr ""
+
+#: ./pcpteams.php
+msgid "Type"
+msgstr ""
+
+#: ./pcpteams.php
+msgid "- select -"
+msgstr ""
+
+#: ./pcpteams.php
+msgid "Team"
+msgstr ""
+
+#: ./pcpteams.php
+msgid "Notifications"
+msgstr ""
+
+#: ./templates/CRM/Pcpteams/CampaignPageSetup-notifications.tpl
+msgid "Notify me by e-mail when a new contribution is received."
+msgstr ""
+
+#: ./templates/CRM/Pcpteams/CampaignPageSetup.tpl
+msgid "<strong>If you want to start a team</strong>, first create a team page. Then you (and your friends) can create your individual pages, and add them to the team."
+msgstr ""
+
+#: ./templates/CRM/Pcpteams/CampaignPageSetup.tpl
+msgid "<strong>If you want to join an existing team</strong>, choose \"Individual\" for the \"Type\" below, then select the team you'd like you join from the \"Team\" drop-down list."
+msgstr ""
+
+#: ./templates/CRM/Pcpteams/CampaignPageSetup.tpl
+msgid "If this page is being used to represent a team, choose \"Team\", otherwise choose \"Individual\" to create a page for yourself as a person. If you are a member of a team, choose \"Individual\" here and then choose the team to join below."
+msgstr ""
+
+#: ./templates/CRM/Pcpteams/CampaignPageSetup.tpl
+msgid "Choose the team you'd like to join. Leave this field empty if you do not want to join a team."
+msgstr ""
+
+#: ./templates/CRM/Pcpteams/PCPInfo-team-members.tpl
+msgid "Raised"
+msgstr ""
+
+#: ./templates/CRM/Pcpteams/PCPInfo-team-members.tpl
+msgid "No members"
+msgstr ""
+
+#: ./templates/CRM/Pcpteams/PCPInfo-team-name.tpl
+msgid "I'm campaigning as part of a team:"
+msgstr ""
+
