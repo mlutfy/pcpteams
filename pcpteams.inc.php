@@ -252,6 +252,8 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
   $approved   = CRM_Utils_Array::key(ts('Approved'), $pcpStatus);
 
   // Get the members of the team
+  $members[$pcp_id] = [];
+
   $dao = CRM_Core_DAO::executeQuery("
     SELECT team.civicrm_pcp_id as id, member.title, member.is_active
       FROM civicrm_pcp_team team
