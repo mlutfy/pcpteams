@@ -10,7 +10,7 @@ index b84903c..34166c4 100644
 +
 +    $return = $contributionSoft->save();
 +
-+    CRM_Utils_Hook::post('create', 'SoftCredit', $params['entity_id'], $params);
++    if (array_key_exists('entity_id', $params)) CRM_Utils_Hook::post('create', 'SoftCredit', $params['entity_id'], $params);
 +
 +    return $return;
    }

@@ -36,12 +36,6 @@ Enabling the extension will allow the following:
 * The thermometer of team pages includes the contribution amounts of
   the team members.
 
-* PCP page owners can enable notifications to receive an e-mail every
-  time they receive a contribution to their page. This is not specific
-  to PCP-teams, and would be a nice feature in CiviCRM core.  Note that
-  we cannot send them a copy of the transaction receipt, because it may
-  be too much information, or may include a tax receipt.
-
 * Contributors can decide whether to give directly to the team, or to
   a specific team member.
 
@@ -64,23 +58,20 @@ https://civicrm.org/blogs/mlutfy/personal-campaign-page-teams
 Requirements
 ============
 
-- CiviCRM >= 4.4
+- CiviCRM >= 4.6 (4.7 recommended)
 
 Support
 =======
 
-Please post bug reports in the issue tracker of this project on github:
+Please post bug reports in the issue tracker of this project on github:  
 https://github.com/mlutfy/ca.bidon.pcpteams/issues
-
-For general questions and support, please post on the "Extensions" forum:
-http://forum.civicrm.org/index.php/board,57.0.html
 
 This is a community contributed extension written thanks to the financial
 support of organisations using it, as well as the very helpful and collaborative
 CiviCRM community.
 
-If you appreciate this module, please consider donating 10$ to the CiviCRM project:
-https://civicrm.org/participate/support-civicrm
+If you appreciate this extension, please consider supporting the CiviCRM project:  
+https://civicrm.org/support-us
 
 While I do my best to provide volunteer support for this extension, please
 consider financially contributing to support or development of this extension
@@ -88,13 +79,11 @@ if you can.
 
 Commercial support via Coop SymbioTIC: <https://www.symbiotic.coop>
 
-Or you can send me the equivalent of a beer: <https://www.bidon.ca/en/paypal>
-
 License
 =======
 
-(C) 2012-2015 Mathieu Lutfy
+(C) 2012-2017 Mathieu Lutfy  
 https://www.symbiotic.coop
 
-Redistributed under the AGPL license:
+Redistributed under the AGPL license:  
 https://civicrm.org/licensing
