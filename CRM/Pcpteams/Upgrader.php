@@ -12,14 +12,14 @@ class CRM_Pcpteams_Upgrader extends CRM_Pcpteams_Upgrader_Base {
    * Run an external SQL script when the module is installed
    */
   public function install() {
-    $this->executeSqlFile('sql/pcpteams-install.sql', TRUE);
+    // onInstall handles the .sql files
   }
 
   /**
    * Run an external SQL script when the module is uninstalled
    */
   public function uninstall() {
-    $this->executeSqlFile('sql/pcpteams-uninstall.sql');
+    // onUninstall handles the .sql files
   }
 
   /**
@@ -44,7 +44,9 @@ class CRM_Pcpteams_Upgrader extends CRM_Pcpteams_Upgrader_Base {
    */
   public function upgrade_4200() {
     $this->ctx->log->info('Applying update 4200');
-    $this->executeSqlFile('sql/upgrade_4200.sql', TRUE);
+    // This used to update the message-templates, but has been
+    // deprecated since it's now in core.
+    // $this->executeSqlFile('sql/upgrade_4200.sql', TRUE);
     return TRUE;
   }
 

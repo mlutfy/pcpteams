@@ -65,15 +65,9 @@ function pcpteams_pcpblockteam_setvalue($target_entity_type, $target_entity_id, 
  * @param Int $pcp_id ID of the PCP page in civicrm_pcp
  * @param Int $pcp_team_id ID of the PCP team (NULL means the page is not part of a team).
  * @param Int $pcp_type_id Type of PCP page (CIVICRM_PCPTEAM_TYPE_TEAM or CIVICRM_PCPTEAM_TYPE_INDIVIDUAL).
- * @param Boolean $notifications Send e-mail notifications to the pcp page owner for each contribution received.
  * @returns void.
  */
-function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id, $notifications = 0) {
-  // QuickForms might put null in here, if it was not checked.
-  if (! $notifications) {
-    $notifications = 0;
-  }
-
+function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id) {
   // If it is a team page, make sure we do not allow to be part of another team
   if ($pcp_type_id == CIVICRM_PCPTEAM_TYPE_TEAM) {
     $pcp_team_id = NULL;
@@ -99,6 +93,7 @@ function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id, $notifications = 
   if ($dao->fetch()) {
 /*
   [ML] do not allow to update for now (change type or team).. too many things to manage.
+  [PeaceWorks] going to assume it's ok to to set a parent, if no parent exists yet (below)
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_pcp_team
       SET status_id = 1,
@@ -110,26 +105,39 @@ function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id, $notifications = 
   }
   else {
     if ($pcp_team_id) {
-      $sql = "INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id, notify_on_contrib)
-                   VALUES (%1, %2, 1, %3, %4)";
-
-      $params = array(
-        1 => array($pcp_id, 'Positive'),
-        2 => array($pcp_team_id, 'Integer'),
-        3 => array($pcp_type_id, 'Integer'),
-        4 => array($notifications, 'Integer'),
-      );
-
+      // Check if there's an existing record, that just doesn't have a parent yet
+      $dao2 = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_team WHERE civicrm_pcp_id = %1", $params);
+      if ($dao2->fetch()) {
+        // A PCP record exists, but no parent
+        $sql = "UPDATE civicrm_pcp_team SET civicrm_pcp_id_parent=%1 WHERE civicrm_pcp_id=%2";
+   
+        // Assuming we can ignore other params like pcp_type_id here...?
+        // We'll only update the team id, and leave the other fields to be managed elsewhere
+        $params = array(
+          1 => array($pcp_team_id, 'Integer'),
+          2 => array($pcp_id, 'Positive'),
+        );
+      }
+      else {
+        // No record in civicrm_pcp_team for this PCP
+        $sql = "INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id)
+                VALUES (%1, %2, 1, %3)";
+   
+        $params = array(
+          1 => array($pcp_id, 'Positive'),
+          2 => array($pcp_team_id, 'Integer'),
+          3 => array($pcp_type_id, 'Integer'),
+        );
+      }
       CRM_Core_DAO::executeQuery($sql, $params);
     }
     else {
-      $sql = "INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id, notify_on_contrib)
-                   VALUES (%1, NULL, 1, %3, %4)";
+      $sql = "INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id)
+              VALUES (%1, NULL, 1, %3)";
 
       $params = array(
         1 => array($pcp_id, 'Positive'),
         3 => array($pcp_type_id, 'Integer'),
-        4 => array($notifications, 'Integer'),
       );
 
       CRM_Core_DAO::executeQuery($sql, $params);
@@ -239,6 +247,8 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
   $approved   = CRM_Utils_Array::key(ts('Approved'), $pcpStatus);
 
   // Get the members of the team
+  $members[$pcp_id] = [];
+
   $dao = CRM_Core_DAO::executeQuery("
     SELECT team.civicrm_pcp_id as id, member.title, member.is_active, team.status_id as team_status_id
       FROM civicrm_pcp_team team
@@ -248,6 +258,9 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
     . ' AND member.status_id = ' . $approved
     . ' ORDER BY member.title asc '
   );
+
+  // initialize empty members for this pcp
+  $members[$pcp_id] = array();
 
   while ($dao->fetch()) {
     $members[$pcp_id][$dao->id] = array(
