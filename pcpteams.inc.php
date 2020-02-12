@@ -62,15 +62,9 @@ function pcpteams_pcpblockteam_setvalue($target_entity_type, $target_entity_id, 
  * @param Int $pcp_id ID of the PCP page in civicrm_pcp
  * @param Int $pcp_team_id ID of the PCP team (NULL means the page is not part of a team).
  * @param Int $pcp_type_id Type of PCP page (CIVICRM_PCPTEAM_TYPE_TEAM or CIVICRM_PCPTEAM_TYPE_INDIVIDUAL).
- * @param Boolean $notifications Send e-mail notifications to the pcp page owner for each contribution received.
  * @returns void.
  */
-function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id, $notifications = 0) {
-  // QuickForms might put null in here, if it was not checked.
-  if (! $notifications) {
-    $notifications = 0;
-  }
-
+function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id) {
   // If it is a team page, make sure we do not allow to be part of another team
   if ($pcp_type_id == CIVICRM_PCPTEAM_TYPE_TEAM) {
     $pcp_team_id = NULL;
@@ -114,7 +108,7 @@ function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id, $notifications = 
         // A PCP record exists, but no parent
         $sql = "UPDATE civicrm_pcp_team SET civicrm_pcp_id_parent=%1 WHERE civicrm_pcp_id=%2";
    
-        // Assuming we can ignore other params like pcp_type_id and notifications here...?
+        // Assuming we can ignore other params like pcp_type_id here...?
         // We'll only update the team id, and leave the other fields to be managed elsewhere
         $params = array(
           1 => array($pcp_team_id, 'Integer'),
@@ -123,26 +117,24 @@ function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id, $notifications = 
       }
       else {
         // No record in civicrm_pcp_team for this PCP
-        $sql = "INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id, notify_on_contrib)
-                     VALUES (%1, %2, 1, %3, %4)";
+        $sql = "INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id)
+                VALUES (%1, %2, 1, %3)";
    
         $params = array(
           1 => array($pcp_id, 'Positive'),
           2 => array($pcp_team_id, 'Integer'),
           3 => array($pcp_type_id, 'Integer'),
-          4 => array($notifications, 'Integer'),
         );
       }
       CRM_Core_DAO::executeQuery($sql, $params);
     }
     else {
-      $sql = "INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id, notify_on_contrib)
-                   VALUES (%1, NULL, 1, %3, %4)";
+      $sql = "INSERT INTO civicrm_pcp_team (civicrm_pcp_id, civicrm_pcp_id_parent, status_id, type_id)
+              VALUES (%1, NULL, 1, %3)";
 
       $params = array(
         1 => array($pcp_id, 'Positive'),
         3 => array($pcp_type_id, 'Integer'),
-        4 => array($notifications, 'Integer'),
       );
 
       CRM_Core_DAO::executeQuery($sql, $params);

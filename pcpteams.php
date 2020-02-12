@@ -141,7 +141,6 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
     $pcp_team_info = pcpteams_getteaminfo($pcp_id);
     $defaults['pcp_team_id'] = $pcp_team_info->civicrm_pcp_id_parent;
     $defaults['pcp_team_type'] = $pcp_team_info->type_id;
-    $defaults['pcp_team_notifications'] = $pcp_team_info->notify_on_contrib;
   }
   elseif ($pcp_team_id) {
     // pcp_id in session means that the URL the user received is an invite to a team
@@ -207,21 +206,12 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
     $form->addElement('select', 'pcp_team_id', E::ts('Team'), $teams);
   }
 
-  // Checkbox to receive contribution notifications
-  $form->addElement('checkbox', 'pcp_team_notifications', E::ts('Notifications'));
-
   $form->setDefaults($defaults);
 
   // Add a template to the form region to display the field
   CRM_Core_Region::instance('pcp-form-campaign')->add(array(
     'template' => 'CRM/Pcpteams/CampaignPageSetup.tpl',
     'weight' => -1,
-  ));
-
-  // Add a template to the form region for the e-mail notification option
-  CRM_Core_Region::instance('pcp-form-campaign')->add(array(
-    'template' => 'CRM/Pcpteams/CampaignPageSetup-notifications.tpl',
-    'weight' => 99,
   ));
 
   $resources = CRM_Core_Resources::singleton();
@@ -252,7 +242,6 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
       $pcp_id = CRM_Utils_Array::value('pcp_id', $form->_defaultValues);
       $pcp_team_id = CRM_Utils_Array::value('pcp_team_id', $form->_submitValues);
       $pcp_team_type = CRM_Utils_Array::value('pcp_team_type', $form->_submitValues);
-      $pcp_team_notifications = CRM_Utils_Array::value('pcp_team_notifications', $form->_submitValues);
 
       // FIXME: If we are creating a new PCP page, how do we get the page ID?
       // Code below is making the dangerous assumptions that new PCP pages are not often created at the same time.
@@ -264,10 +253,7 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
       }
 
       // This only supports the initial creation for now
-      pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_team_type, $pcp_team_notifications);
-
-      // E-mail notifications on contribution received
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_pcp_team SET notify_on_contrib = " . intval($pcp_team_notifications) . " WHERE civicrm_pcp_id = " . $pcp_id);
+      pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_team_type);
 
       // unset the value from the session so that it does not cause problems later on
       // if the team is modified.
@@ -333,58 +319,3 @@ function pcpteams_civicrm_pageRun(&$page) {
       break;
   }
 }
-
-/**
- * Implements hook_civicrm_post().
- */
-function pcpteams_civicrm_post($op, $objectName, $objectId, &$objectRef) {
-  if ($objectName == 'SoftCredit' && $op == 'create') {
-    //get the default domain email address.
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
-
-    // FIXME: objectRef is received as an array, but should be an object.
-    // i.e. need to fix the patch on core.
-
-    $contrib = new CRM_Contribute_DAO_Contribution();
-    $contrib->id = $objectRef['contribution_id'];
-    $contrib->find(TRUE);
-
-    $pcpcreator = civicrm_api3('Contact', 'getsingle', array(
-      'id' => $objectRef['contact_id'],
-    ));
-
-    $contributor = new CRM_Contact_DAO_Contact();
-    $contributor->id = $contrib->contact_id;
-    $contributor->find(TRUE);
-
-    $contributoremail = new CRM_Core_DAO_Email();
-    $contributoremail->contact_id = $contrib->contact_id;
-    $contributoremail->find(TRUE);
-
-    // NB: because we can't have the exact PCP page, we use the contribution page source
-    // Ex: Online Contribution: Name of PCP Page.
-    // FIXME: since 4.4 we have the specific pcp_id in the soft_credit object.
-    $tplParams = array(
-      'pcpName' => $contrib->source,
-      'displayName' => $pcpcreator['display_name'],
-      'contributorFirstName' => $contributor->first_name,
-      'contributorLastName' => $contributor->last_name,
-      'contributorEmail' => $contributoremail->email,
-      'contributionAmount' => $contrib->total_amount,
-      'currency' => $contrib->currency,
-    );
-
-    $sendTemplateParams = array(
-      'groupName' => 'msg_tpl_workflow_contribution',
-      'valueName' => 'pcpteams_notification_contribution',
-      'contactId' => $pcpcreator['contact_id'],
-      'toEmail' => $pcpcreator['email'],
-      'from' => "$domainEmailName <$domainEmailAddress>",
-      'tplParams' => $tplParams,
-      'isTest' => $contrib->is_test,
-    );
-
-    CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
-  }
-}
-

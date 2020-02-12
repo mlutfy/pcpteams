@@ -36,12 +36,6 @@ Enabling the extension will allow the following:
 * The thermometer of team pages includes the contribution amounts of
   the team members.
 
-* PCP page owners can enable notifications to receive an e-mail every
-  time they receive a contribution to their page. This is not specific
-  to PCP-teams, and would be a nice feature in CiviCRM core.  Note that
-  we cannot send them a copy of the transaction receipt, because it may
-  be too much information, or may include a tax receipt.
-
 * Contributors can decide whether to give directly to the team, or to
   a specific team member.
 
