@@ -12,14 +12,14 @@ class CRM_Pcpteams_Upgrader extends CRM_Pcpteams_Upgrader_Base {
    * Run an external SQL script when the module is installed
    */
   public function install() {
-    $this->executeSqlFile('sql/pcpteams-install.sql');
+    // onInstall handles the .sql files
   }
 
   /**
    * Run an external SQL script when the module is uninstalled
    */
   public function uninstall() {
-    $this->executeSqlFile('sql/pcpteams-uninstall.sql');
+    // onUninstall handles the .sql files
   }
 
   /**
