@@ -3,6 +3,9 @@
 define('CIVICRM_PCPTEAM_TYPE_INDIVIDUAL', 1);
 define('CIVICRM_PCPTEAM_TYPE_TEAM', 2);
 
+define('CIVICRM_PCPTEAM_STATUS_APPROVED', 1);
+define('CIVICRM_PCPTEAM_STATUS_DENIED', 2);
+
 
 /**
  * Helper functions.
@@ -85,7 +88,7 @@ function pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_type_id) {
     1 => array($pcp_id, 'Positive'),
   );
 
-  $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_team WHERE status_id = 1 AND civicrm_pcp_id = %1 AND civicrm_pcp_id_parent is not NULL", $params);
+  $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_team WHERE civicrm_pcp_id = %1", $params);
 
   if ($dao->fetch()) {
 /*
@@ -247,7 +250,7 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
   $members[$pcp_id] = [];
 
   $dao = CRM_Core_DAO::executeQuery("
-    SELECT team.civicrm_pcp_id as id, member.title, member.is_active
+    SELECT team.civicrm_pcp_id as id, member.title, member.is_active, team.status_id as team_status_id
       FROM civicrm_pcp_team team
      INNER JOIN civicrm_pcp member ON (member.id = team.civicrm_pcp_id)
      WHERE civicrm_pcp_id_parent = " . $pcp_id
@@ -264,6 +267,8 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
       'title' => $dao->title,
       'amount' => CRM_PCP_BAO_PCP::thermoMeter($dao->id),
       'is_active' => $dao->is_active,
+      'honor' => CRM_PCP_BAO_PCP::honorRoll($dao->id),
+      'team_status_id' => $dao->team_status_id,
     );
   }
 

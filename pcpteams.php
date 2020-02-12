@@ -128,12 +128,14 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_PCPAccount(&$form) {
  * See: pcpteams_civicrm_buildForm()
  */
 function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
+
   // Prepare default values (nb: radio buttons are handled differently since setDefault doesn't work)
   $session = CRM_Core_Session::singleton();
   $pcp_team_id = $session->get('pcp_team_id');
   $pcp_id = CRM_Utils_Array::value('pcp_id', $form->_defaultValues);
 
   $defaults = array();
+  $pcp_team_info_template = array();
   $pcp_team_info = NULL;
 
   if ($pcp_id) {
@@ -141,15 +143,26 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
     $pcp_team_info = pcpteams_getteaminfo($pcp_id);
     $defaults['pcp_team_id'] = $pcp_team_info->civicrm_pcp_id_parent;
     $defaults['pcp_team_type'] = $pcp_team_info->type_id;
+    $pcp_team_info_template['team_id'] = $pcp_team_info->civicrm_pcp_id_parent;
+    $pcp_team_info_template['team_type'] = $pcp_team_info->type_id;
   }
   elseif ($pcp_team_id) {
     // pcp_id in session means that the URL the user received is an invite to a team
     $defaults['pcp_team_id'] = $pcp_team_id;
     $defaults['pcp_team_type'] = CIVICRM_PCPTEAM_TYPE_INDIVIDUAL;
+    $pcp_team_info_template['team_id'] = $pcp_team_id;
+    $pcp_team_info_template['team_type'] = CIVICRM_PCPTEAM_TYPE_INDIVIDUAL;
   }
   else {
     $defaults['pcp_team_type'] = CIVICRM_PCPTEAM_TYPE_INDIVIDUAL;
+    $pcp_team_info_template['team_type'] = CIVICRM_PCPTEAM_TYPE_INDIVIDUAL;
+    $pcp_team_info_template['team_id'] = NULL;
   }
+
+  // Add team information to template variables
+  // TODO: this doesn't really belong here. relocate to the civi form run hook or somewhere better
+  $smarty = CRM_Core_Smarty::singleton();
+  $smarty->assign('pcp_team_info', $pcp_team_info_template);
 
   // For new pages, we keep a hidden field with the first/last name
   // because team members cannot choose a name for their page.
@@ -161,6 +174,10 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   // Type of page (new team or individual)
   // We do not allow to change this for existing pages (or people following a "join this team" link).
   if (! empty($defaults['pcp_team_id'])) {
+    $form->addElement('hidden', 'pcp_team_type', $defaults['pcp_team_type'], array('id' => 'pcp_team_type'));
+  }
+  else if (empty($defaults['pcp_team_id']) && $defaults['pcp_team_type'] == CIVICRM_PCPTEAM_TYPE_TEAM) {
+    // Team lead can also not change the team type once it is set.
     $form->addElement('hidden', 'pcp_team_type', $defaults['pcp_team_type'], array('id' => 'pcp_team_type'));
   }
   else {
@@ -206,6 +223,35 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
 
     $form->addElement('select', 'pcp_team_id', E::ts('Team'), $teams);
   }
+ 
+  // this is a team page, but no parent.
+  if ($pcp_team_info->type_id == CIVICRM_PCPTEAM_TYPE_TEAM && empty($pcp_team_info->civicrm_pcp_id_parent)) {
+    $members = pcpteams_getmembers($pcp_id, TRUE);
+    foreach($members as $dao => $member) {
+      $member_status_radios = array();
+
+      $member_status_elements = array(
+        CIVICRM_PCPTEAM_STATUS_APPROVED => array(
+          'label' => ts('Approved'),
+        ),
+        CIVICRM_PCPTEAM_STATUS_DENIED => array(
+          'label' => ts('Denied'),
+        ),
+      );
+
+      $defaults["pcp_team_member_status_$dao"] = $member['team_status_id'];
+      $member_status_options = array();
+      foreach ($member_status_elements as $key => $e) {
+        if ($defaults["pcp_team_member_status_$dao"] == $key) {
+          $member_status_options['checked'] = TRUE;
+        }
+
+        $member_status_radios[$key] = $form->addElement('radio', NULL, $key, $e['label'], $key, $member_status_options);
+      }
+
+      $form->addGroup($member_status_radios, "pcp_team_member_status_$dao", ts('%1', array($member['title'])));
+    }
+  }
 
   $form->setDefaults($defaults);
 
@@ -213,6 +259,12 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   CRM_Core_Region::instance('pcp-form-campaign')->add(array(
     'template' => 'CRM/Pcpteams/CampaignPageSetup.tpl',
     'weight' => -1,
+  ));
+
+  // Add a template to the form region for the e-mail notification option
+  CRM_Core_Region::instance('pcp-form-campaign')->add(array(
+    'template' => 'CRM/Pcpteams/CampaignPageSetup-member-status.tpl',
+    'weight' => 100,
   ));
 
   $resources = CRM_Core_Resources::singleton();
@@ -255,6 +307,20 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
 
       // This only supports the initial creation for now
       pcpteams_setteam($pcp_id, $pcp_team_id, $pcp_team_type);
+
+      // Update member status.
+      // First check that this is a team page, but no parent.
+      if ($pcp_team_type == CIVICRM_PCPTEAM_TYPE_TEAM && empty($pcp_team_id)) {
+        $members = pcpteams_getmembers($pcp_id, TRUE);
+        foreach($members as $member_dao => $member) {
+          $pcp_team_member_status = CRM_Utils_Array::value("pcp_team_member_status_${member_dao}", $form->_submitValues);
+          $member_params = array(
+              1 => array($pcp_team_member_status, 'Integer'),
+              2 => array($member_dao, 'Positive'),
+          );
+          CRM_Core_DAO::executeQuery("UPDATE civicrm_pcp_team SET status_id = %1 WHERE civicrm_pcp_id = %2", $member_params);
+        }
+      }
 
       // unset the value from the session so that it does not cause problems later on
       // if the team is modified.
@@ -306,8 +372,16 @@ function pcpteams_civicrm_pageRun(&$page) {
 
           $achieved = $total / $smarty->_tpl_vars['pcp']['goal_amount'] * 100;
 
+          $honor = $page->get_template_vars('honor');
+          foreach ($members as $dao => $member) {
+            if (!empty($member['honor'])) {
+              $honor = array_merge($honor, $member['honor']);
+            }
+          }
+
           $smarty->assign('total', $total);
           $smarty->assign('achieved', $achieved);
+          $page->assign('honor', $honor);
 
           CRM_Core_Region::instance('pcp-page-pcpinfo')->add(array(
             'template' => 'CRM/Pcpteams/PCPInfo-team-members.tpl',
