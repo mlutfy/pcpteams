@@ -133,7 +133,7 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   $pcp_team_id = $session->get('pcp_team_id');
   $pcp_id = CRM_Utils_Array::value('pcp_id', $form->_defaultValues);
 
-  $defaults = array();
+  $defaults = [];
   $pcp_team_info = NULL;
 
   if ($pcp_id) {
@@ -155,7 +155,17 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
   // because team members cannot choose a name for their page.
   // (this was a design choice, to keep the team member listings simple).
   if (! $pcp_id) {
-    $form->addElement('hidden', 'pcp_team_default_title', $session->get('pcp_team_first_name') . ' ' . $session->get('pcp_team_last_name'));
+    $contact_id = $session->get('userID');
+    $contact = civicrm_api3('Contact', 'get', [
+      'id' => $contact_id,
+      'sequential' => 1,
+    ]);
+
+    if (!empty($contact['values'][0]['display_name'])) {
+      CRM_Core_Resources::singleton()->addVars('pcpteams', [
+        'default_title' => $contact['values'][0]['display_name'],
+      ]);
+    }
   }
 
   // Type of page (new team or individual)
@@ -164,16 +174,16 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
     $form->addElement('hidden', 'pcp_team_type', $defaults['pcp_team_type'], array('id' => 'pcp_team_type'));
   }
   else {
-    $radios = array();
+    $radios = [];
 
-    $elements = array(
-      CIVICRM_PCPTEAM_TYPE_INDIVIDUAL => array(
+    $elements = [
+      CIVICRM_PCPTEAM_TYPE_INDIVIDUAL => [
         'label' => E::ts('This page represents an individual'),
-      ),
-      CIVICRM_PCPTEAM_TYPE_TEAM => array(
+      ],
+      CIVICRM_PCPTEAM_TYPE_TEAM => [
         'label' => E::ts('This page represents a team'),
-      ),
-    );
+      ],
+    ];
 
     foreach ($elements as $key => $e) {
       if ($defaults['pcp_team_type'] == $key) {

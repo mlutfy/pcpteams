@@ -5,8 +5,8 @@ cj(function($) {
     if ($('input[name="pcp_team_id"]').val() || $('select#pcp_team_id').val()) {
       // Has a team, so hide the title, the title will be his/her name
       $('#Campaign .crm-contribution-form-block-title').hide();
-      if ($('input[name="pcp_team_default_title"]').length > 0) {
-        $('#pcp_title').val($('input[name="pcp_team_default_title"]').val());
+      if (typeof CRM.vars.pcpteams.default_title != 'undefined') {
+        $('#pcp_title').val(CRM.vars.pcpteams.default_title);
       }
     }
     else {
