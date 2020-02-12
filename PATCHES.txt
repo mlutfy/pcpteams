@@ -1,20 +1,3 @@
-diff --git a/CRM/Contribute/BAO/ContributionSoft.php b/CRM/Contribute/BAO/ContributionSoft.php
-index b84903c..34166c4 100644
---- a/CRM/Contribute/BAO/ContributionSoft.php
-+++ b/CRM/Contribute/BAO/ContributionSoft.php
-@@ -59,7 +59,12 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
-       $config = CRM_Core_Config::singleton();
-       $contributionSoft->currency = $config->defaultCurrency;
-     }
--    return $contributionSoft->save();
-+
-+    $return = $contributionSoft->save();
-+
-+    if (array_key_exists('entity_id', $params)) CRM_Utils_Hook::post('create', 'SoftCredit', $params['entity_id'], $params);
-+
-+    return $return;
-   }
-
 diff --git a/CRM/Friend/Form.php b/CRM/Friend/Form.php
 index 0a74441..94b53c7 100644
 --- a/CRM/Friend/Form.php

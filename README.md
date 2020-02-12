@@ -5,10 +5,8 @@ CiviCRM personal campaign teams allows people to create their own personal
 campaign page (PCP) which is part of a team, with a common objective as well
 as an individual page for each member.
 
-## Warning
-
-This extension is still minimally maintained, but in Spring 2015, Veda
-Consulting developed a similar extension with more features:
+This extension is still maintained, but in Spring 2015, Veda
+Consulting developed a similar extension with a different workflow:
 
 https://github.com/veda-consulting/uk.co.vedaconsulting.pcpteams
 
@@ -43,13 +41,12 @@ Installation
 ============
 
 To download the latest version of this extension:
-https://github.com/mlutfy/ca.bidon.pcpteams
+https://github.com/mlutfy/pcpteams
 
 * Unpack the module code in your CiviCRM extension directory, then enable.
 
-* This module requires a patch on CiviCRM core. See PATCHES.txt.
-  One patch is to add a SoftCredit "hook_civicrm_post", the other is optional,
-  so that "tell a friend" inherits the default subject/body configuration from
+* This module proposes an optional patch on CiviCRM core. See PATCHES.txt.
+  It makes "tell a friend" inherit the default subject/body configuration from
   the contribution form.
 
 More information:
@@ -58,7 +55,7 @@ https://civicrm.org/blogs/mlutfy/personal-campaign-page-teams
 Requirements
 ============
 
-- CiviCRM >= 4.6 (4.7 recommended)
+- CiviCRM >= 5.0
 
 Support
 =======
@@ -82,8 +79,8 @@ Commercial support via Coop SymbioTIC: <https://www.symbiotic.coop>
 License
 =======
 
-(C) 2012-2017 Mathieu Lutfy  
-https://www.symbiotic.coop
+(C) 2012-2020 Mathieu Lutfy  
+https://www.symbiotic.coop/en
 
 Redistributed under the AGPL license:  
 https://civicrm.org/licensing
