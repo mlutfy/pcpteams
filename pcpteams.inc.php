@@ -256,6 +256,9 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
     . ' ORDER BY member.title asc '
   );
 
+  // initialize empty members for this pcp
+  $members[$pcp_id] = array();
+
   while ($dao->fetch()) {
     $members[$pcp_id][$dao->id] = array(
       'title' => $dao->title,
