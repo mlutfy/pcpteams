@@ -242,10 +242,10 @@ function pcpteams_civicrm_buildForm_CRM_PCP_Form_Campaign(&$form) {
 
       $member_status_elements = array(
         CIVICRM_PCPTEAM_STATUS_APPROVED => array(
-          'label' => ts('Approved'),
+          'label' => E::ts('Approved'),
         ),
         CIVICRM_PCPTEAM_STATUS_DENIED => array(
-          'label' => ts('Denied'),
+          'label' => E::ts('Denied'),
         ),
       );
 
