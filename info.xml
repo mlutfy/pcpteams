@@ -3,8 +3,7 @@
   <file>pcpteams</file>
   <name>Personal Campaign Teams</name>
   <description>Allows Personal Campaign Pages to be part of teams, with a common objective as well as an individual page for each member.</description>
-  <license>AGPL</license>
-  <downloadUrl>https://github.com/mlutfy/ca.bidon.pcpteams/archive/master.zip</downloadUrl>
+  <license>AGPL-3.0</license>
   <maintainer>
     <author>Mathieu Lutfy</author>
     <email>mathieu@symbiotic.coop</email>
@@ -20,7 +19,6 @@
   <compatibility>
     <ver>5.0</ver>
   </compatibility>
-  <comments>See README.md for more information.</comments>
   <civix>
     <namespace>CRM/Pcpteams</namespace>
   </civix>
