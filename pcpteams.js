@@ -1,4 +1,4 @@
-cj(function($) {
+CRM.$(function($) {
   // Hide the team title if the person is joining a team
   // NB: the link the person received may include a pre-set team ID
   function pcpteams_profile_toggle_title() {
@@ -41,5 +41,17 @@ cj(function($) {
     // hide the person's name (pcp_title), since that will probably not be the team name.
     $('#pcp_title').val('');
     pcpteams_profile_toggle_teamlist();
+
+    // For new pages, toggle the default goal amount, if there is one
+    if ($('input[name="pcp_team_type"]:checked').val() == 1 || $('input[name="pcp_team_type"][type="hidden"]').val() == 1) {
+      if (typeof CRM.vars.pcpteams.default_individual_goal_amount != 'undefined') {
+        $('#goal_amount').val(CRM.vars.pcpteams.default_individual_goal_amount);
+      }
+    }
+    else {
+      if (typeof CRM.vars.pcpteams.default_team_goal_amount != 'undefined') {
+        $('#goal_amount').val(CRM.vars.pcpteams.default_team_goal_amount);
+      }
+    }
   });
 });

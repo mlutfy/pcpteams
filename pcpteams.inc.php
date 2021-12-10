@@ -21,7 +21,9 @@ function pcpteams_pcpblockteam_getvalue($target_entity_type, $target_entity_id) 
   $pcpblock->target_entity_id = $target_entity_id;
 
   if ($pcpblock->find(TRUE)) {
-    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_block_team WHERE civicrm_pcp_block_id = " . $pcpblock->id);
+    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_block_team WHERE civicrm_pcp_block_id = %1", [
+      1 => [$pcpblock->id, 'Positive'],
+    ]);
 
     if ($dao->fetch()) {
       return $dao->is_active;
@@ -32,29 +34,73 @@ function pcpteams_pcpblockteam_getvalue($target_entity_type, $target_entity_id) 
 }
 
 /**
- * Sets the current pcpblock "team" is_active value.
- * e.g. whether the form allows PCP by teams.
+ * Returns all the information about the pcp_block_team
+ *
+ * @todo Convert this to a proper BAO.
  */
-function pcpteams_pcpblockteam_setvalue($target_entity_type, $target_entity_id, $pcp_team_active) {
+function pcpteams_pcpblockteam_getvalues($target_entity_type, $target_entity_id) {
   $pcpblock = new CRM_PCP_DAO_PCPBlock();
   $pcpblock->target_entity_type = $target_entity_type;
   $pcpblock->target_entity_id = $target_entity_id;
 
-  $pcp_team_active = intval($pcp_team_active);
-
   if ($pcpblock->find(TRUE)) {
-    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_block_team WHERE civicrm_pcp_block_id = " . $pcpblock->id);
+    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_block_team WHERE civicrm_pcp_block_id = %1", [
+      1 => [$pcpblock->id, 'Positive'],
+    ]);
 
     if ($dao->fetch()) {
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_pcp_block_team SET is_active = " . $pcp_team_active . " WHERE civicrm_pcp_block_id = " . $dao->civicrm_pcp_block_id);
+      return $dao->toArray();
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Sets the current pcpblock "team" is_active value.
+ * e.g. whether the form allows PCP by teams.
+ *
+ * @todo Replace with a BAO function create when we have proper entities
+ */
+function pcpteams_pcpblockteam_setvalue($params) {
+  $pcpblock = new CRM_PCP_DAO_PCPBlock();
+  $pcpblock->target_entity_type = $params['target_entity_type'];
+  $pcpblock->target_entity_id = $params['target_entity_id'];
+
+  // @todo Replace by Api4 or proper BAO calls
+  if ($pcpblock->find(TRUE)) {
+    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_pcp_block_team WHERE civicrm_pcp_block_id = %1", [
+      1 => [$pcpblock->id, 'Positive'],
+    ]);
+
+    if ($dao->fetch()) {
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_pcp_block_team
+        SET is_active = %1, max_members = %2, default_team_goal_amount = %3, default_individual_goal_amount = %4, default_intro_text = %5, default_page_text = %6
+        WHERE civicrm_pcp_block_id = %7", [
+        1 => [$params['pcp_team_is_active'] ?: 0, 'Integer'],
+        2 => [$params['max_members'] ?: 0, 'Integer'],
+        3 => [$params['default_team_goal_amount'] ?: 0, 'Float'],
+        4 => [$params['default_individual_goal_amount'] ?: 0, 'Float'],
+        5 => [$params['default_intro_text'] ?? '', 'String'],
+        6 => [$params['default_page_text'] ?? '', 'String'],
+        7 => [$dao->civicrm_pcp_block_id, 'Positive'],
+      ]);
     }
     else {
-      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_pcp_block_team (civicrm_pcp_block_id, is_active)
-                                  VALUES ({$pcpblock->id}, $pcp_team_active)");
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_pcp_block_team (is_active, max_members, civicrm_pcp_block_id, default_individual_goal_amount, default_intro_text, default_page_text, civicrm_pcp_block_id)
+        VALUES (%1, %2, %3, %4, %5, %6, %7)", [
+        1 => [$params['pcp_team_is_active'] ?: 0, 'Integer'],
+        2 => [$params['max_members'] ?: 0, 'Integer'],
+        3 => [$params['default_team_goal_amount'] ?: 0, 'Float'],
+        4 => [$params['default_individual_goal_amount'] ?: 0, 'Float'],
+        5 => [$params['default_intro_text'] ?? '', 'String'],
+        6 => [$params['default_page_text'] ?? '', 'String'],
+        7 => [$dao->civicrm_pcp_block_id, 'Positive'],
+      ]);
     }
   }
   else {
-    CRM_Core_Error::fatal(ts('Could not find the PCPBlock for entity: %1 %2', array(1 => $target_entity_id, 2 => $target_entity_type)));
+    throw new Exception('Could not find the PCPBlock for entity ' . $target_entity_type . '/' . $target_entity_id);
   }
 }
 
@@ -243,8 +289,8 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
   }
 
   // Get the status_id for 'approved'
-  $pcpStatus  = CRM_Contribute_PseudoConstant::pcpStatus();
-  $approved   = CRM_Utils_Array::key(ts('Approved'), $pcpStatus);
+  $pcpStatus = CRM_Contribute_PseudoConstant::pcpStatus('name');
+  $approved = CRM_Utils_Array::key('Approved', $pcpStatus);
 
   // Get the members of the team
   $members[$pcp_id] = [];
@@ -253,14 +299,15 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
     SELECT team.civicrm_pcp_id as id, member.title, member.is_active, team.status_id as team_status_id
       FROM civicrm_pcp_team team
      INNER JOIN civicrm_pcp member ON (member.id = team.civicrm_pcp_id)
-     WHERE civicrm_pcp_id_parent = " . $pcp_id
+     WHERE civicrm_pcp_id_parent = %1 "
     . ($show_non_approved ? '' : " AND team.status_id = 1 ")
     . ' AND member.status_id = ' . $approved
-    . ' ORDER BY member.title asc '
-  );
+    . ' ORDER BY member.title asc', [
+    1 => [$pcp_id, 'Positive'],
+  ]);
 
-  // initialize empty members for this pcp
-  $members[$pcp_id] = array();
+  // Initialize empty members for this pcp
+  $members[$pcp_id] = [];
 
   while ($dao->fetch()) {
     $members[$pcp_id][$dao->id] = array(
