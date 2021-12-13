@@ -5,10 +5,7 @@ CiviCRM personal campaign teams allows people to create their own personal
 campaign page (PCP) which is part of a team, with a common objective as well
 as an individual page for each member.
 
-This extension is still maintained, but in Spring 2015, Veda
-Consulting developed a similar extension with a different workflow:
-
-https://github.com/veda-consulting/uk.co.vedaconsulting.pcpteams
+https://civicrm.org/extensions/pcp-teams
 
 ## Features
 
