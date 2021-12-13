@@ -289,8 +289,7 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
   }
 
   // Get the status_id for 'approved'
-  $pcpStatus = CRM_Contribute_PseudoConstant::pcpStatus('name');
-  $approved = CRM_Utils_Array::key('Approved', $pcpStatus);
+  $approved = CRM_Core_PseudoConstant::getKey('CRM_PCP_BAO_PCP', 'status_id', 'Approved');
 
   // Get the members of the team
   $members[$pcp_id] = [];
