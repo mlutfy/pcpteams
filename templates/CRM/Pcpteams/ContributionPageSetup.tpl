@@ -4,10 +4,10 @@
     <td class="label">&nbsp;</td>
     <td>{$form.pcp_team_is_active.html} {$form.pcp_team_is_active.label}</td>
   </tr>
-  <tr class="crm-contribution-contributionpage-pcp-form-block-max_members_per_team crm-pcpteams-setting">
-    <td class="label">{$form.max_members_per_team.label}</td>
+  <tr class="crm-contribution-contributionpage-pcp-form-block-max_members crm-pcpteams-setting">
+    <td class="label">{$form.max_members.label}</td>
     <td>
-      {$form.max_members_per_team.html}
+      {$form.max_members.html}
       <div class="description">{ts}Limit the maximum number of members per team? Set to 0 to disable limits.{/ts}</div>
     </td>
   </tr>
