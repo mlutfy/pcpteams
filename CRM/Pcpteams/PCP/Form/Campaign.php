@@ -112,7 +112,39 @@ class CRM_Pcpteams_PCP_Form_Campaign {
         unset($teams[$pcp_id]);
       }
 
+      // Check if the team is full
+      $full_teams = [];
+      $block = pcpteams_pcpblockteam_getvalue($form->_component, $component_page_id);
+      $max_members = CRM_Core_DAO::singleValueQuery('SELECT max_members FROM civicrm_pcp_block_team WHERE civicrm_pcp_block_id = %1', [
+        1 => [$block['id'], 'Positive'],
+      ]);
+
+      if ($max_members) {
+        foreach ($teams as $id => $label) {
+          if (!$id) {
+            // Skip the "- select -" option
+            continue;
+          }
+          $count_members = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_pcp_team WHERE civicrm_pcp_id_parent = %1', [
+            1 => [$id, 'Positive'],
+          ]);
+          if ($count_members >= $max_members) {
+            $teams[$id] = E::ts('%1 - full', [1 => $label]);
+            $full_teams[] = $id;
+          }
+        }
+      }
+
       $form->addElement('select', 'pcp_team_id', E::ts('Team'), $teams);
+
+      // Disable the options for full teams
+      $e = $form->getElement('pcp_team_id');
+
+      foreach ($e->_options as $key => $val) {
+        if (in_array($val['attr']['value'], $full_teams)) {
+          $e->_options[$key]['attr']['disabled'] = 'disabled';
+        }
+      }
     }
 
     // this is a team page, but no parent.
