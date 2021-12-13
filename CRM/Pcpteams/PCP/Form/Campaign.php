@@ -19,6 +19,10 @@ class CRM_Pcpteams_PCP_Form_Campaign {
     $pcp_team_info_template = [];
     $pcp_team_info = NULL;
 
+    // Variables later exposed to Smarty
+    $pcp_team_members = [];
+    $has_team_members = FALSE;
+
     if ($pcp_id) {
       // Existing PCP page, so show previously saved values
       $pcp_team_info = pcpteams_getteaminfo($pcp_id);
@@ -147,10 +151,11 @@ class CRM_Pcpteams_PCP_Form_Campaign {
       }
     }
 
-    // this is a team page, but no parent.
+    // This is a team page, and no parent
+    // Add form elements to manage the status of team members
     if ($pcp_team_info->type_id == CIVICRM_PCPTEAM_TYPE_TEAM && empty($pcp_team_info->civicrm_pcp_id_parent)) {
       $members = pcpteams_getmembers($pcp_id, TRUE);
-      foreach($members as $dao => $member) {
+      foreach ($members as $member_pcp_id => $member) {
         $member_status_radios = [];
 
         $member_status_elements = [
@@ -162,10 +167,13 @@ class CRM_Pcpteams_PCP_Form_Campaign {
           ],
         ];
 
-        $defaults["pcp_team_member_status_$dao"] = $member['team_status_id'];
+        $has_team_members = TRUE;
+        $pcp_team_members[$member_pcp_id] = $member['team_status_id'];
+        $defaults["pcp_team_member_status_$member_pcp_id"] = $member['team_status_id'];
         $member_status_options = [];
+
         foreach ($member_status_elements as $key => $e) {
-          if ($defaults["pcp_team_member_status_$dao"] == $key) {
+          if ($defaults["pcp_team_member_status_$member_pcp_id"] == $key) {
             $member_status_options['checked'] = TRUE;
           }
 
@@ -173,8 +181,11 @@ class CRM_Pcpteams_PCP_Form_Campaign {
         }
 
         // @todo Suspicious use of ts()
-        $form->addGroup($member_status_radios, "pcp_team_member_status_$dao", ts('%1', [$member['title']]));
+        $form->addGroup($member_status_radios, "pcp_team_member_status_$member_pcp_id", ts('%1', [$member['title']]));
       }
+
+      $smarty->assign('pcp_team_has_team_members', $has_team_members);
+      $smarty->assign('pcp_team_members', $pcp_team_members);
     }
 
     // Default goal amount, intro, page text

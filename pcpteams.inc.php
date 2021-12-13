@@ -280,7 +280,7 @@ function pcpteams_getteamname($pcp_id) {
  * Ex: for the member listing, and "total amount raised".
  */
 function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
-  static $members = array();
+  static $members = [];
 
   $pcp_id = intval($pcp_id);
 
@@ -310,13 +310,13 @@ function pcpteams_getmembers($pcp_id, $show_non_approved = FALSE) {
   $members[$pcp_id] = [];
 
   while ($dao->fetch()) {
-    $members[$pcp_id][$dao->id] = array(
+    $members[$pcp_id][$dao->id] = [
       'title' => $dao->title,
       'amount' => CRM_PCP_BAO_PCP::thermoMeter($dao->id),
       'is_active' => $dao->is_active,
       'honor' => CRM_PCP_BAO_PCP::honorRoll($dao->id),
       'team_status_id' => $dao->team_status_id,
-    );
+    ];
   }
 
   return $members[$pcp_id];

@@ -139,13 +139,12 @@ function pcpteams_civicrm_postProcess($formName, &$form) {
       // First check that this is a team page, but no parent.
       if ($pcp_team_type == CIVICRM_PCPTEAM_TYPE_TEAM && empty($pcp_team_id)) {
         $members = pcpteams_getmembers($pcp_id, TRUE);
-        foreach($members as $member_dao => $member) {
-          $pcp_team_member_status = CRM_Utils_Array::value("pcp_team_member_status_${member_dao}", $form->_submitValues);
-          $member_params = array(
-              1 => array($pcp_team_member_status, 'Integer'),
-              2 => array($member_dao, 'Positive'),
-          );
-          CRM_Core_DAO::executeQuery("UPDATE civicrm_pcp_team SET status_id = %1 WHERE civicrm_pcp_id = %2", $member_params);
+        foreach($members as $member_pcp_id => $member) {
+          $pcp_team_member_status = CRM_Utils_Array::value("pcp_team_member_status_${member_pcp_id}", $form->_submitValues);
+          CRM_Core_DAO::executeQuery("UPDATE civicrm_pcp_team SET status_id = %1 WHERE civicrm_pcp_id = %2", [
+            1 => [$pcp_team_member_status, 'Integer'],
+            2 => [$member_pcp_id, 'Positive'],
+          ]);
         }
       }
 
