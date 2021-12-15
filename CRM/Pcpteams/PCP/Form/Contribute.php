@@ -17,11 +17,14 @@ class CRM_Pcpteams_PCP_Form_Contribute {
     $form->add('textarea', 'default_intro_text', E::ts('Default welcome text'), ['class' => 'big']);
     $form->add('wysiwyg', 'default_page_text', E::ts('Default Your Message text'));
 
-    $target_entity_table = $form->_defaultValues['target_entity_table'] ?? NULL;
-    $target_entity_id = $form->_defaultValues['target_entity_id'] ?? NULL;
-    $defaults = pcpteams_pcpblockteam_getvalues($target_entity_table, $target_entity_id);
-    $defaults['pcp_team_is_active'] = $defaults['is_active'] ?? 0;
-    $form->setDefaults($defaults);
+    // If it is an existing PCP Block
+    if (!empty($form->_defaultValues['target_entity_type'])) {
+      $target_entity_type = $form->_defaultValues['target_entity_type'];
+      $target_entity_id = $form->_defaultValues['target_entity_id'];
+      $defaults = pcpteams_pcpblockteam_getvalues($target_entity_type, $target_entity_id);
+      $defaults['pcp_team_is_active'] = $defaults['is_active'] ?? 0;
+      $form->setDefaults($defaults);
+    }
 
     // Add a template to the form region to display the field
     CRM_Core_Region::instance('pcp-form-pcp-fields')->add([

@@ -87,7 +87,7 @@ function pcpteams_pcpblockteam_setvalue($params) {
       ]);
     }
     else {
-      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_pcp_block_team (is_active, max_members, civicrm_pcp_block_id, default_individual_goal_amount, default_intro_text, default_page_text, civicrm_pcp_block_id)
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_pcp_block_team (is_active, max_members, default_team_goal_amount, default_individual_goal_amount, default_intro_text, default_page_text, civicrm_pcp_block_id)
         VALUES (%1, %2, %3, %4, %5, %6, %7)", [
         1 => [$params['pcp_team_is_active'] ?: 0, 'Integer'],
         2 => [$params['max_members'] ?: 0, 'Integer'],
