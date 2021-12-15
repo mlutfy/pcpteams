@@ -95,7 +95,7 @@ function pcpteams_pcpblockteam_setvalue($params) {
         4 => [$params['default_individual_goal_amount'] ?: 0, 'Float'],
         5 => [$params['default_intro_text'] ?? '', 'String'],
         6 => [$params['default_page_text'] ?? '', 'String'],
-        7 => [$dao->civicrm_pcp_block_id, 'Positive'],
+        7 => [$pcpblock->id, 'Positive'],
       ]);
     }
   }
