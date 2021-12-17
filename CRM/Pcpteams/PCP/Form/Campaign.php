@@ -190,7 +190,8 @@ class CRM_Pcpteams_PCP_Form_Campaign {
 
     // Default goal amount, intro, page text
     if (!$pcp_id) {
-      $pcp_block_team = pcpteams_pcpblockteam_getvalues($form->_component, $form->_pageId);
+      $target_entity_id = $form->controller->get('component_page_id');
+      $pcp_block_team = pcpteams_pcpblockteam_getvalues($form->_component, $target_entity_id);
       $defaults['pcp_intro_text'] = $pcp_block_team['default_intro_text'];
       $defaults['page_text'] = $pcp_block_team['default_page_text'];
       $defaults['goal_amount'] = $pcp_block_team['default_individual_goal_amount'];

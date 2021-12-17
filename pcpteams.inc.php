@@ -39,6 +39,10 @@ function pcpteams_pcpblockteam_getvalue($target_entity_type, $target_entity_id) 
  * @todo Convert this to a proper BAO.
  */
 function pcpteams_pcpblockteam_getvalues($target_entity_type, $target_entity_id) {
+  if (!$target_entity_id) {
+    throw new Exception("Empty target_entity_id");
+  }
+
   $pcpblock = new CRM_PCP_DAO_PCPBlock();
   $pcpblock->target_entity_type = $target_entity_type;
   $pcpblock->target_entity_id = $target_entity_id;
