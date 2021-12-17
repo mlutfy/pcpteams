@@ -118,9 +118,10 @@ class CRM_Pcpteams_PCP_Form_Campaign {
 
       // Check if the team is full
       $full_teams = [];
-      $block = pcpteams_pcpblockteam_getvalue($form->_component, $component_page_id);
+      $block = pcpteams_pcpblockteam_getvalues($form->_component, $component_page_id);
+
       $max_members = CRM_Core_DAO::singleValueQuery('SELECT max_members FROM civicrm_pcp_block_team WHERE civicrm_pcp_block_id = %1', [
-        1 => [$block['id'], 'Positive'],
+        1 => [$block['civicrm_pcp_block_id'], 'Positive'],
       ]);
 
       if ($max_members) {
