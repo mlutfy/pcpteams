@@ -21,9 +21,11 @@ class CRM_Pcpteams_PCP_Form_Contribute {
     if (!empty($form->_defaultValues['target_entity_type'])) {
       $target_entity_type = $form->_defaultValues['target_entity_type'];
       $target_entity_id = $form->_defaultValues['target_entity_id'];
-      $defaults = pcpteams_pcpblockteam_getvalues($target_entity_type, $target_entity_id);
-      $defaults['pcp_team_is_active'] = $defaults['is_active'] ?? 0;
-      $form->setDefaults($defaults);
+      if ($target_entity_id) {
+        $defaults = pcpteams_pcpblockteam_getvalues($target_entity_type, $target_entity_id);
+        $defaults['pcp_team_is_active'] = $defaults['is_active'] ?? 0;
+        $form->setDefaults($defaults);
+      }
     }
 
     // Add a template to the form region to display the field
