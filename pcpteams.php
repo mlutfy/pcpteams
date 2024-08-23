@@ -167,7 +167,7 @@ function pcpteams_civicrm_pageRun(&$page) {
       // Fetch the team pcp_id, if any, to display the team name
       $smarty = CRM_Core_Smarty::singleton();
 
-      $pcp = $smarty->_tpl_vars['pcp'];
+      $pcp = $smarty->get_template_vars()['pcp'];
       $pcp_team_info = pcpteams_getteaminfo($pcp['pcp_id']);
 
       if (!$pcp_team_info) {
@@ -196,7 +196,7 @@ function pcpteams_civicrm_pageRun(&$page) {
           $total = CRM_PCP_BAO_PCP::thermoMeter($pcp['pcp_id']);
           $total += pcpteams_getamountraised($pcp['pcp_id']);
 
-          $achieved = $total / $smarty->_tpl_vars['pcp']['goal_amount'] * 100;
+          $achieved = $total / $smarty->get_template_vars()['pcp']['goal_amount'] * 100;
 
           $honor = $page->get_template_vars('honor');
           foreach ($members as $dao => $member) {

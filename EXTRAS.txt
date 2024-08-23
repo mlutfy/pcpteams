@@ -21,7 +21,7 @@ function example_civicrm_pageRun(&$page) {
        $smarty = CRM_Core_Smarty::singleton();
 
        // Fetch information for the PCP page being currently displayed
-       $pcp = $smarty->_tpl_vars['pcp'];
+       $pcp = $smarty->get_template_vars()['pcp'];
        $pcp_team_info = pcpteams_getteaminfo($pcp['pcp_id']);
 
        // List of PCP page IDs for which we will check offline donations
@@ -68,7 +68,7 @@ function example_civicrm_pageRun(&$page) {
 
        if ($offline) {
          $smarty->assign('civicrm_offline_amount', $offline);
-         $offlineachieved = $offline / $smarty->_tpl_vars['pcp']['goal_amount'] * 100;
+         $offlineachieved = $offline / $smarty->get_template_vars()['pcp']['goal_amount'] * 100;
          $smarty->assign('civicrm_offline_achieved', $offlineachieved);
        }
 
